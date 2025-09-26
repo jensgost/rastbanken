@@ -611,6 +611,7 @@ const SimpleApp: React.FC = () => {
               <button
                 onClick={() => {
                   showInput('Vad heter redskapet?', 'T.ex. Fotboll, Hopprep...', (equipmentName) => {
+                    const formattedName = toCamelCase(equipmentName);
                     // Close the first modal before opening the second
                     setInputPrompt(null);
                     setTimeout(() => {
@@ -620,7 +621,7 @@ const SimpleApp: React.FC = () => {
                           showConfirmation('Fel', 'Ange ett giltigt antal (minst 1)');
                           return;
                         }
-                        addEquipment(equipmentName, 'Sport', quantity);
+                        addEquipment(formattedName, 'Sport', quantity);
                       });
                     }, 100);
                   });
