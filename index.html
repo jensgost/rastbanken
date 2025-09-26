@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- App Theme -->
+    <meta name="theme-color" content="#0066CC" />
+
+    <!-- Mobile App -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Rastbanken" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <!-- SEO & Description -->
+    <meta name="description" content="Rastbanken - Skolrastgårdens Redskapsbank för att låna och återlämna rastgårdsredskap" />
+    <meta name="keywords" content="skola, rastgård, redskap, lån, barn, svenska" />
+
+    <!-- Accessibility & Language -->
+    <meta name="language" content="Swedish" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Fonts - Preload Swedish-optimized fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <title>Rastbanken - Skolrastgårdens Redskapsbank</title>
+
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Main App Script -->
+    <script type="module" src="/src/index.tsx"></script>
+
+    <!-- Accessibility: Skip to main content link for screen readers -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded">
+      Hoppa till huvudinnehåll
+    </a>
+
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: Inter, sans-serif;">
+        <h1>🏫 Rastbanken</h1>
+        <p>Denna app kräver JavaScript för att fungera.</p>
+        <p>Vänligen aktivera JavaScript i din webbläsare och ladda om sidan.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

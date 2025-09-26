@@ -1,0 +1,304 @@
+/**
+ * Simple app context - exactly what we need, nothing more
+ */
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans } from '@/utils/db';
+import type { Class, Student, Equipment, Loan } from '@/utils/db';
+
+interface AppState {
+  // Data
+  classes: Class[];
+  students: Student[];
+  equipment: (Equipment & { available: number })[];
+  loans: Loan[];
+
+  // UI state
+  loading: boolean;
+
+  // Simple actions
+  loadData: () => Promise<void>;
+  createLoan: (studentId: string, equipmentId: string) => Promise<void>;
+  returnLoan: (loanId: string) => Promise<void>;
+  addStudent: (name: string, classId: string) => Promise<void>;
+  addEquipment: (name: string, category: string, quantity: number) => Promise<void>;
+
+  // Admin actions
+  deleteStudent: (studentId: string) => Promise<void>;
+  deleteClass: (classId: string) => Promise<void>;
+  addClass: (name: string, colorCode: string) => Promise<void>;
+  deleteEquipment: (equipmentId: string) => Promise<void>;
+  updateEquipment: (equipmentId: string, newQuantity: number) => Promise<void>;
+}
+
+const AppContext = createContext<AppState | null>(null);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [equipment, setEquipment] = useState<(Equipment & { available: number })[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load all data - simple and direct
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      await initDB();
+
+      // Get existing data
+      const [classesData, studentsData, equipmentData, loansData] = await Promise.all([
+        getAll<Class>('classes'),
+        getAll<Student>('students'),
+        getAvailableEquipment(),
+        getActiveLoans()
+      ]);
+
+      // One-time class initialization (only if database is completely empty)
+      if (classesData.length === 0) {
+        const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
+        const requiredClasses = [
+          // Förskoleklass FA-FC
+          { id: 'fa', name: 'FA' },
+          { id: 'fb', name: 'FB' },
+          { id: 'fc', name: 'FC' },
+          // Grades 1-6, classes A-C
+          { id: '1a', name: '1A' }, { id: '1b', name: '1B' }, { id: '1c', name: '1C' },
+          { id: '2a', name: '2A' }, { id: '2b', name: '2B' }, { id: '2c', name: '2C' },
+          { id: '3a', name: '3A' }, { id: '3b', name: '3B' }, { id: '3c', name: '3C' },
+          { id: '4a', name: '4A' }, { id: '4b', name: '4B' }, { id: '4c', name: '4C' },
+          { id: '5a', name: '5A' }, { id: '5b', name: '5B' }, { id: '5c', name: '5C' },
+          { id: '6a', name: '6A' }, { id: '6b', name: '6B' }, { id: '6c', name: '6C' }
+        ];
+
+        const newClasses: Class[] = [];
+        for (let i = 0; i < requiredClasses.length; i++) {
+          const reqClass = requiredClasses[i];
+          const colorIndex = i % COLORS.length;
+          const newClass = {
+            id: reqClass.id,
+            name: reqClass.name,
+            colorCode: COLORS[colorIndex]
+          };
+          newClasses.push(newClass);
+          await addItem('classes', newClass);
+        }
+        setClasses(newClasses);
+      } else {
+        setClasses(classesData);
+      }
+
+      setStudents(studentsData);
+      setEquipment(equipmentData);
+      setLoans(loansData);
+    } catch (error) {
+      // Error loading data - fail silently in production
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Create loan - with availability check
+  const createLoan = async (studentId: string, equipmentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    const equipmentItem = equipment.find(e => e.id === equipmentId);
+    const studentClass = classes.find(c => c.id === student?.classId);
+
+    if (!student || !equipmentItem || !studentClass) {
+      throw new Error('Student, equipment, or class not found');
+    }
+
+    // Check if equipment is available
+    if (equipmentItem.available <= 0) {
+      throw new Error('Equipment not available');
+    }
+
+    const loan: Loan = {
+      id: Date.now().toString(),
+      studentId,
+      equipmentId,
+      borrowedAt: new Date().toISOString(),
+      studentName: student.name,
+      equipmentName: equipmentItem.name,
+      className: studentClass.name
+    };
+
+    await addItem('loans', loan);
+
+    // Update state directly instead of reloading all data
+    setLoans(prev => [...prev, loan]);
+    setEquipment(prev => prev.map(eq =>
+      eq.id === equipmentId
+        ? { ...eq, available: eq.available - 1 }
+        : eq
+    ));
+  };
+
+  // Return loan - simple
+  const returnLoan = async (loanId: string) => {
+    // Find the loan to get equipment ID before deleting
+    const loan = loans.find(l => l.id === loanId);
+    if (!loan) {
+      throw new Error('Loan not found');
+    }
+
+    await deleteItem('loans', loanId);
+
+    // Update state directly instead of reloading all data
+    setLoans(prev => prev.filter(l => l.id !== loanId));
+    setEquipment(prev => prev.map(eq =>
+      eq.id === loan.equipmentId
+        ? { ...eq, available: eq.available + 1 }
+        : eq
+    ));
+  };
+
+  // Add student - simple
+  const addStudent = async (name: string, classId: string) => {
+    const student: Student = {
+      id: Date.now().toString(),
+      name,
+      classId
+    };
+
+    await addItem('students', student);
+
+    // Update state directly instead of reloading all data
+    setStudents(prev => [...prev, student]);
+  };
+
+  // Add equipment - simple
+  const addEquipment = async (name: string, category: string, quantity: number) => {
+    const equipmentItem: Equipment = {
+      id: Date.now().toString(),
+      name,
+      category,
+      totalQuantity: quantity
+    };
+
+    await addItem('equipment', equipmentItem);
+
+    // Update state directly - add equipment with full availability
+    setEquipment(prev => [...prev, { ...equipmentItem, available: quantity }]);
+  };
+
+  // Delete student - simple
+  const deleteStudent = async (studentId: string) => {
+    await deleteItem('students', studentId);
+
+    // Update state directly instead of reloading all data
+    setStudents(prev => prev.filter(s => s.id !== studentId));
+  };
+
+  // Delete class - cascading delete (students + their loans)
+  const deleteClass = async (classId: string) => {
+    // Find all students in this class
+    const classStudents = students.filter(s => s.classId === classId);
+
+    // Find all loans by students in this class and return them
+    const studentIds = classStudents.map(s => s.id);
+    const classLoans = loans.filter(l => studentIds.includes(l.studentId));
+
+    // Return all loans (this updates equipment availability)
+    for (const loan of classLoans) {
+      await deleteItem('loans', loan.id);
+    }
+
+    // Delete all students in this class
+    for (const student of classStudents) {
+      await deleteItem('students', student.id);
+    }
+
+    // Finally delete the class
+    await deleteItem('classes', classId);
+
+    // Update state directly instead of reloading all data
+    setLoans(prev => prev.filter(l => !studentIds.includes(l.studentId)));
+    setStudents(prev => prev.filter(s => s.classId !== classId));
+    setClasses(prev => prev.filter(c => c.id !== classId));
+
+    // Reload equipment to refresh availability counts
+    const updatedEquipment = await getAvailableEquipment();
+    setEquipment(updatedEquipment);
+  };
+
+  // Add class - simple
+  const addClass = async (name: string, colorCode: string) => {
+    const newClass: Class = {
+      id: Date.now().toString(),
+      name,
+      colorCode
+    };
+
+    await addItem('classes', newClass);
+
+    // Update state directly instead of reloading all data
+    setClasses(prev => [...prev, newClass]);
+  };
+
+  // Delete equipment - simple
+  const deleteEquipment = async (equipmentId: string) => {
+    await deleteItem('equipment', equipmentId);
+
+    // Update state directly instead of reloading all data
+    setEquipment(prev => prev.filter(eq => eq.id !== equipmentId));
+  };
+
+  // Update equipment quantity - simple
+  const updateEquipment = async (equipmentId: string, newQuantity: number) => {
+    const equipmentItem = equipment.find(e => e.id === equipmentId);
+    if (!equipmentItem) {
+      throw new Error('Equipment not found');
+    }
+
+    const updatedEquipment: Equipment = {
+      ...equipmentItem,
+      totalQuantity: newQuantity
+    };
+
+    await updateItem('equipment', updatedEquipment);
+
+    // Update state directly instead of reloading all data
+    // Calculate new available quantity (total - currently borrowed)
+    const currentlyBorrowed = equipmentItem.totalQuantity - equipmentItem.available;
+    const newAvailable = newQuantity - currentlyBorrowed;
+
+    setEquipment(prev => prev.map(eq =>
+      eq.id === equipmentId
+        ? { ...eq, totalQuantity: newQuantity, available: Math.max(0, newAvailable) }
+        : eq
+    ));
+  };
+
+  // Initialize on mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const value: AppState = {
+    classes,
+    students,
+    equipment,
+    loans,
+    loading,
+    loadData,
+    createLoan,
+    returnLoan,
+    addStudent,
+    addEquipment,
+    deleteStudent,
+    deleteClass,
+    addClass,
+    deleteEquipment,
+    updateEquipment
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within AppProvider');
+  }
+  return context;
+};
