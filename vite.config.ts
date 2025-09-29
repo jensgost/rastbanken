@@ -26,8 +26,8 @@ export default defineConfig({
         background_color: '#f0f9ff',
         display: 'standalone',
         orientation: 'landscape-primary',
-        start_url: '/',
-        scope: '/',
+        start_url: process.env.NODE_ENV === 'production' ? '/rastbanken/' : '/',
+        scope: process.env.NODE_ENV === 'production' ? '/rastbanken/' : '/',
         icons: [
           {
             src: 'rastbanken-icon.svg',

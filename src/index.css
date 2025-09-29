@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Disable zoom and scrolling for native app feel */
+html, body {
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Allow text selection only in input fields */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Prevent zoom on input focus */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Prevent rubber band scrolling on iOS */
+body {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}

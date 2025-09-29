@@ -253,6 +253,7 @@ const SimpleApp: React.FC = () => {
     placeholder: string;
     onSubmit: (value: string) => void;
     maxLength?: number;
+    inputMode?: 'text' | 'numeric';
   } | null>(null);
 
   // Reusable confirmation modal state
@@ -280,12 +281,13 @@ const SimpleApp: React.FC = () => {
   };
 
   // Simplified input prompt with validation
-  const showInput = (title: string, placeholder: string, onSubmit: (value: string) => void, maxLength?: number) => {
+  const showInput = (title: string, placeholder: string, onSubmit: (value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric') => {
     setInputValue(''); // Clear previous input
     setInputPrompt({
       title,
       placeholder,
       maxLength,
+      inputMode,
       onSubmit: (value: string) => {
         // Basic input validation
         const sanitized = value.trim();
@@ -331,6 +333,7 @@ const SimpleApp: React.FC = () => {
             id="modal-input"
             name="modalInput"
             type="text"
+            inputMode={inputPrompt.inputMode || 'text'}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={inputPrompt.placeholder}
@@ -414,7 +417,7 @@ const SimpleApp: React.FC = () => {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4 text-red-600">Är du säker?</h2>
             <p className="text-lg text-gray-700 mb-6">
-              Är du säker på att du vill rensa all data? Alla klasser, elever och redskap kommer tas bort.
+              Alla klasser, elever och redskap kommer tas bort.
               Detta går inte att ångra!
             </p>
             <div className="flex gap-4 justify-center">
@@ -674,7 +677,7 @@ const SimpleApp: React.FC = () => {
                           return;
                         }
                         addEquipment(formattedName, 'Sport', quantity);
-                      });
+                      }, 3, 'numeric');
                     }, 100);
                   });
                 }}
@@ -775,6 +778,7 @@ const SimpleApp: React.FC = () => {
               id="admin-pin"
               name="adminPin"
               type="password"
+              inputMode="numeric"
               placeholder="PIN-kod"
               value={adminPin}
               onChange={(e) => setAdminPin(e.target.value)}
@@ -851,7 +855,7 @@ const SimpleApp: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
               {/* Manage Classes */}
-              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[550px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Klasser</h2>
                 </div>
@@ -894,7 +898,7 @@ const SimpleApp: React.FC = () => {
               </div>
 
               {/* Manage Students */}
-              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[550px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Elever</h2>
                   <input
@@ -922,7 +926,7 @@ const SimpleApp: React.FC = () => {
                             return;
                           }
                           addStudent(formattedName, selectedClass.id);
-                        });
+                        }, 5, 'text');
                       }, 100);
                     });
                   }}
@@ -973,7 +977,7 @@ const SimpleApp: React.FC = () => {
               </div>
 
               {/* Manage Equipment */}
-              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[550px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Redskap</h2>
                   <button
@@ -1004,7 +1008,7 @@ const SimpleApp: React.FC = () => {
                             return;
                           }
                           addEquipment(formattedName, 'Sport', quantity);
-                        });
+                        }, 3, 'numeric');
                       }, 100);
                     });
                   }}
