@@ -17,7 +17,7 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true
       },
-      includeAssets: ['rastbanken-icon.svg'],
+      includeAssets: ['rastbanken-icon-v2.svg'],
       manifest: {
         name: 'Rastbanken - Skolrastgårdens Redskapsbank',
         short_name: 'Rastbanken',
@@ -30,7 +30,7 @@ export default defineConfig({
         scope: process.env.NODE_ENV === 'production' ? '/rastbanken/' : '/',
         icons: [
           {
-            src: 'rastbanken-icon.svg',
+            src: 'rastbanken-icon-v2.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any maskable'
