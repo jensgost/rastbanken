@@ -2,39 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Disable zoom and scrolling for native app feel */
-html, body {
-  touch-action: manipulation;
-  overscroll-behavior: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+/* Aggressive mobile app settings - disable ALL zoom and movement */
+* {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
 }
 
 /* Allow text selection only in input fields */
 input, textarea {
-  -webkit-user-select: text;
-  user-select: text;
+  -webkit-user-select: text !important;
+  user-select: text !important;
 }
 
-/* Prevent zoom on input focus */
-input, select, textarea {
-  font-size: 16px;
+/* Prevent zoom completely */
+html {
+  touch-action: manipulation !important;
+  -webkit-text-size-adjust: 100% !important;
+  -webkit-touch-callout: none !important;
 }
 
-/* Prevent rubber band scrolling on iOS */
 body {
-  position: fixed;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  touch-action: manipulation !important;
+  overscroll-behavior: none !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Prevent zoom on input focus - MUST be 16px or larger */
+input, select, textarea, button {
+  font-size: 16px !important;
+  touch-action: manipulation !important;
 }
 
 #root {
-  width: 100%;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  width: 100% !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
 }

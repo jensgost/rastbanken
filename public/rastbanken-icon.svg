@@ -2,28 +2,8 @@
   <!-- Background circle -->
   <circle cx="96" cy="96" r="96" fill="#22c55e"/>
 
-  <!-- Skip rope -->
-  <g transform="translate(96, 96)">
-    <!-- Left handle -->
-    <rect x="-70" y="-8" width="20" height="16" fill="white" rx="8"/>
-    <rect x="-68" y="-6" width="16" height="12" fill="#22c55e" rx="6"/>
-
-    <!-- Right handle -->
-    <rect x="50" y="-8" width="20" height="16" fill="white" rx="8"/>
-    <rect x="52" y="-6" width="16" height="12" fill="#22c55e" rx="6"/>
-
-    <!-- Rope curve (left side) -->
-    <path d="M -50 0 Q -30 -40 0 -35" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-    <!-- Rope curve (right side) -->
-    <path d="M 0 -35 Q 30 -40 50 0" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-    <!-- Rope curve (bottom arc) -->
-    <path d="M -50 0 Q 0 60 50 0" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-    <!-- Motion lines (optional - adds dynamic feel) -->
-    <path d="M -45 15 Q 0 75 45 15" stroke="white" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
-  </g>
+  <!-- Football emoji -->
+  <text x="96" y="120" font-family="Arial, sans-serif" font-size="80" text-anchor="middle" fill="white">⚽</text>
 
   <!-- Small text at bottom -->
   <text x="96" y="170" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">RASTBANKEN</text>
