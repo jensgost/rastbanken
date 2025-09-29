@@ -189,6 +189,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Return all loans (this updates equipment availability)
     for (const loan of studentLoans) {
       await deleteItem('loans', loan.id);
+
+      // Update equipment availability immediately for each returned loan
+      setEquipment(prev => prev.map(eq =>
+        eq.id === loan.equipmentId
+          ? { ...eq, available: eq.available + 1 }
+          : eq
+      ));
     }
 
     // Delete the student
@@ -197,10 +204,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Update state directly instead of reloading all data
     setStudents(prev => prev.filter(s => s.id !== studentId));
     setLoans(prev => prev.filter(l => l.studentId !== studentId));
-
-    // Reload equipment to refresh availability counts
-    const updatedEquipment = await getAvailableEquipment();
-    setEquipment(updatedEquipment);
   };
 
   // Delete class - cascading delete (students + their loans)
