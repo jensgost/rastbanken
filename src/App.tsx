@@ -13,7 +13,6 @@ const FADE_DURATION = 400;
 const MODAL_AUTO_HIDE_DURATION = 3000;
 const PIN_LENGTH = 4;
 
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6'];
 
 // Simple admin PIN check - secure enough for school app
 const checkPin = (pin: string) => {
@@ -445,14 +444,14 @@ const SimpleApp: React.FC = () => {
       <>
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-8">
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-4">
               <h1 className="text-4xl font-bold">Välj din klass</h1>
               <button onClick={() => setScreen('start')} className="px-4 py-2 bg-gray-200 rounded">
                 ← Tillbaka
               </button>
             </div>
 
-            <div className="flex justify-center mt-16">
+            <div className="flex justify-center mt-8">
               <div className="space-y-4">
               {sortedClassGroups.map(([grade, classes]) => (
                   <div key={grade}>
@@ -797,10 +796,8 @@ const SimpleApp: React.FC = () => {
 
                 <button
                   onClick={() => {
-                    showInput('Klassnamn (t.ex. 4A):', 'Skriv klassnamn här...', (name) => {
-                      const colors = COLORS;
-                      const colorCode = colors[Math.floor(Math.random() * colors.length)];
-                      addClass(name.toUpperCase(), colorCode);
+                    showInput('Klassnamn (t.ex. 19A, 18B):', 'Födelseår + bokstav...', (name) => {
+                      addClass(name.toUpperCase());
                     });
                   }}
                   className="w-full mb-4 p-3 bg-green-500 text-white rounded font-semibold active:scale-95 transition-transform duration-75"

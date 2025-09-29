@@ -5,6 +5,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans } from '@/utils/db';
 import type { Class, Student, Equipment, Loan } from '@/utils/db';
 
+const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
+
+const getNextColor = (existingClasses: Class[]): string => {
+  const colorIndex = existingClasses.length % COLORS.length;
+  return COLORS[colorIndex];
+};
+
 interface AppState {
   // Data
   classes: Class[];
@@ -25,7 +32,7 @@ interface AppState {
   // Admin actions
   deleteStudent: (studentId: string) => Promise<void>;
   deleteClass: (classId: string) => Promise<void>;
-  addClass: (name: string, colorCode: string) => Promise<void>;
+  addClass: (name: string) => Promise<void>;
   deleteEquipment: (equipmentId: string) => Promise<void>;
   updateEquipment: (equipmentId: string, newQuantity: number) => Promise<void>;
 }
@@ -53,39 +60,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         getActiveLoans()
       ]);
 
-      // One-time class initialization (only if database is completely empty)
-      if (classesData.length === 0) {
-        const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
-        const requiredClasses = [
-          // Förskoleklass FA-FC
-          { id: 'fa', name: 'FA' },
-          { id: 'fb', name: 'FB' },
-          { id: 'fc', name: 'FC' },
-          // Grades 1-6, classes A-C
-          { id: '1a', name: '1A' }, { id: '1b', name: '1B' }, { id: '1c', name: '1C' },
-          { id: '2a', name: '2A' }, { id: '2b', name: '2B' }, { id: '2c', name: '2C' },
-          { id: '3a', name: '3A' }, { id: '3b', name: '3B' }, { id: '3c', name: '3C' },
-          { id: '4a', name: '4A' }, { id: '4b', name: '4B' }, { id: '4c', name: '4C' },
-          { id: '5a', name: '5A' }, { id: '5b', name: '5B' }, { id: '5c', name: '5C' },
-          { id: '6a', name: '6A' }, { id: '6b', name: '6B' }, { id: '6c', name: '6C' }
-        ];
-
-        const newClasses: Class[] = [];
-        for (let i = 0; i < requiredClasses.length; i++) {
-          const reqClass = requiredClasses[i];
-          const colorIndex = i % COLORS.length;
-          const newClass = {
-            id: reqClass.id,
-            name: reqClass.name,
-            colorCode: COLORS[colorIndex]
-          };
-          newClasses.push(newClass);
-          await addItem('classes', newClass);
-        }
-        setClasses(newClasses);
-      } else {
-        setClasses(classesData);
-      }
+      setClasses(classesData);
 
       setStudents(studentsData);
       setEquipment(equipmentData);
@@ -238,8 +213,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEquipment(updatedEquipment);
   };
 
-  // Add class - simple
-  const addClass = async (name: string, colorCode: string) => {
+  // Add class - with automatic color cycling
+  const addClass = async (name: string) => {
+    const colorCode = getNextColor(classes);
     const newClass: Class = {
       id: Date.now().toString(),
       name,
