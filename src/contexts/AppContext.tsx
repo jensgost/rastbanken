@@ -2,7 +2,7 @@
  * Simple app context - exactly what we need, nothing more
  */
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans } from '@/utils/db';
+import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans, clearAllData } from '@/utils/db';
 import type { Class, Student, Equipment, Loan } from '@/utils/db';
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
@@ -35,6 +35,7 @@ interface AppState {
   addClass: (name: string) => Promise<void>;
   deleteEquipment: (equipmentId: string) => Promise<void>;
   updateEquipment: (equipmentId: string, newQuantity: number) => Promise<void>;
+  resetAllData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -262,6 +263,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ));
   };
 
+  // Reset all data - clear database and reset state
+  const resetAllData = async () => {
+    await clearAllData();
+
+    // Reset all state to empty
+    setClasses([]);
+    setStudents([]);
+    setEquipment([]);
+    setLoans([]);
+  };
+
   // Initialize on mount
   useEffect(() => {
     loadData();
@@ -282,7 +294,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     deleteClass,
     addClass,
     deleteEquipment,
-    updateEquipment
+    updateEquipment,
+    resetAllData
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

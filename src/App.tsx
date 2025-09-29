@@ -32,7 +32,7 @@ const checkPin = (pin: string) => {
 type Screen = 'start' | 'borrow-class' | 'borrow-student' | 'borrow-equipment' | 'return' | 'admin' | 'admin-dashboard';
 
 const SimpleApp: React.FC = () => {
-  const { classes, students, equipment, loans, loading, createLoan, returnLoan, addStudent, addEquipment, deleteStudent, deleteClass, addClass, deleteEquipment, updateEquipment } = useApp();
+  const { classes, students, equipment, loans, loading, createLoan, returnLoan, addStudent, addEquipment, deleteStudent, deleteClass, addClass, deleteEquipment, updateEquipment, resetAllData } = useApp();
 
   // Helper function to sort classes naturally (1A, 1B, 1C, 2A, 2B, 2C, etc.)
   const sortClasses = (classList: Class[]) => {
@@ -260,6 +260,9 @@ const SimpleApp: React.FC = () => {
   const [confirmTitle, setConfirmTitle] = useState('');
   const [confirmMessage, setConfirmMessage] = useState('');
 
+  // Reset confirmation modal state
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
+
   // Helper function for fade-out delete animation
   const fadeAndDelete = (itemId: string, deleteAction: () => void) => {
     // Add to fading items for gray fade effect
@@ -387,6 +390,53 @@ const SimpleApp: React.FC = () => {
     );
   };
 
+  // Reset Confirmation Modal Component
+  const ResetConfirmationModal = () => {
+    if (!showResetConfirmModal) return null;
+
+    const handleModalClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+    };
+
+    const handleBackdropClick = () => {
+      setShowResetConfirmModal(false);
+    };
+
+    const handleReset = () => {
+      resetAllData();
+      setShowResetConfirmModal(false);
+      showConfirmation('Klart!', 'All data har raderats');
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50" onClick={handleBackdropClick}>
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={handleModalClick}>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4 text-red-600">Är du säker?</h2>
+            <p className="text-lg text-gray-700 mb-6">
+              Är du säker på att du vill rensa all data? Alla klasser, elever och redskap kommer tas bort.
+              Detta går inte att ångra!
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setShowResetConfirmModal(false)}
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg active:scale-95 transition-transform"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={handleReset}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg active:scale-95 transition-transform"
+              >
+                Ja, radera allt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50 flex items-center justify-center">
@@ -434,6 +484,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -478,6 +529,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -535,6 +587,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -634,6 +687,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -705,6 +759,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -749,6 +804,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }
@@ -762,6 +818,12 @@ const SimpleApp: React.FC = () => {
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold">Admin Panel</h1>
               <div className="flex gap-4">
+                <button
+                  onClick={() => setShowResetConfirmModal(true)}
+                  className="px-4 py-2 bg-red-500 text-white rounded active:scale-95 transition-transform"
+                >
+                  Reset All Data
+                </button>
                 <button
                   onClick={() => {
                     showInput('Ny admin PIN (4 siffror):', 'Ange 4 siffror...', (newPin) => {
@@ -789,7 +851,7 @@ const SimpleApp: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
               {/* Manage Classes */}
-              <div className="bg-white rounded-xl p-6 min-h-[600px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Klasser</h2>
                 </div>
@@ -805,7 +867,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till klass
                 </button>
 
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="space-y-2 max-h-[450px] overflow-y-auto">
                   {memoizedClasses.map((cls) => (
                     <div
                       key={cls.id}
@@ -832,7 +894,7 @@ const SimpleApp: React.FC = () => {
               </div>
 
               {/* Manage Students */}
-              <div className="bg-white rounded-xl p-6 min-h-[600px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Elever</h2>
                   <input
@@ -869,7 +931,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till elev
                 </button>
 
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="space-y-2 max-h-[450px] overflow-y-auto">
                   {filteredStudents.map((student) => {
                     const studentClass = memoizedClasses.find(c => c.id === student.classId);
                     return (
@@ -911,7 +973,7 @@ const SimpleApp: React.FC = () => {
               </div>
 
               {/* Manage Equipment */}
-              <div className="bg-white rounded-xl p-6 min-h-[600px] border-2 border-gray-200">
+              <div className="bg-white rounded-xl p-6 min-h-[500px] border-2 border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Redskap</h2>
                   <button
@@ -951,7 +1013,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till redskap
                 </button>
 
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="space-y-2 max-h-[450px] overflow-y-auto">
                   {memoizedEquipment.map((item) => (
                     <div key={item.id} className={`p-2 border rounded transition-all duration-400 ${
                       fadingItems.has(item.id) ? 'opacity-20 bg-gray-100' : ''
@@ -1012,6 +1074,7 @@ const SimpleApp: React.FC = () => {
         </div>
         <InputModal />
         <ConfirmationModal />
+        <ResetConfirmationModal />
       </>
     );
   }

@@ -140,3 +140,29 @@ export const getAvailableEquipment = async (): Promise<(Equipment & { available:
 export const getActiveLoans = async (): Promise<Loan[]> => {
   return await getAll<Loan>('loans');
 };
+
+// Clear all data (for reset functionality)
+export const clearAllData = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const stores = ['classes', 'students', 'equipment', 'loans'];
+    const transaction = db.transaction(stores, 'readwrite');
+
+    let completedStores = 0;
+
+    stores.forEach(storeName => {
+      const objectStore = transaction.objectStore(storeName);
+      const clearRequest = objectStore.clear();
+
+      clearRequest.onsuccess = () => {
+        completedStores++;
+        if (completedStores === stores.length) {
+          resolve();
+        }
+      };
+
+      clearRequest.onerror = () => reject(clearRequest.error);
+    });
+
+    transaction.onerror = () => reject(transaction.error);
+  });
+};
