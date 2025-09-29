@@ -17,12 +17,12 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true
       },
-      includeAssets: ['vite.svg'],
+      includeAssets: ['rastbanken-icon.svg'],
       manifest: {
         name: 'Rastbanken - Skolrastgårdens Redskapsbank',
         short_name: 'Rastbanken',
         description: 'En app för att låna och återlämna rastgårdsredskap på skolan',
-        theme_color: '#0066CC',
+        theme_color: '#22c55e',
         background_color: '#f0f9ff',
         display: 'standalone',
         orientation: 'landscape-primary',
@@ -30,7 +30,7 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: 'vite.svg',
+            src: 'rastbanken-icon.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any maskable'
