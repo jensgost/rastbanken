@@ -808,7 +808,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till klass
                 </button>
 
-                <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {memoizedClasses.map((cls) => (
                     <div
                       key={cls.id}
@@ -872,7 +872,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till elev
                 </button>
 
-                <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {filteredStudents.map((student) => {
                     const studentClass = memoizedClasses.find(c => c.id === student.classId);
                     return (
@@ -954,7 +954,7 @@ const SimpleApp: React.FC = () => {
                   + Lägg till redskap
                 </button>
 
-                <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {memoizedEquipment.map((item) => (
                     <div key={item.id} className={`p-2 border rounded transition-all duration-400 ${
                       fadingItems.has(item.id) ? 'opacity-20 bg-gray-100' : ''

@@ -181,12 +181,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEquipment(prev => [...prev, { ...equipmentItem, available: quantity }]);
   };
 
-  // Delete student - simple
+  // Delete student - with loan cleanup
   const deleteStudent = async (studentId: string) => {
+    // Find all loans by this student and return them first
+    const studentLoans = loans.filter(l => l.studentId === studentId);
+
+    // Return all loans (this updates equipment availability)
+    for (const loan of studentLoans) {
+      await deleteItem('loans', loan.id);
+    }
+
+    // Delete the student
     await deleteItem('students', studentId);
 
     // Update state directly instead of reloading all data
     setStudents(prev => prev.filter(s => s.id !== studentId));
+    setLoans(prev => prev.filter(l => l.studentId !== studentId));
+
+    // Reload equipment to refresh availability counts
+    const updatedEquipment = await getAvailableEquipment();
+    setEquipment(updatedEquipment);
   };
 
   // Delete class - cascading delete (students + their loans)
