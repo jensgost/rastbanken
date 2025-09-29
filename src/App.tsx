@@ -253,7 +253,7 @@ const SimpleApp: React.FC = () => {
     placeholder: string;
     onSubmit: (value: string) => void;
     maxLength?: number;
-    inputMode?: 'text' | 'numeric';
+    inputMode?: 'text' | 'numeric' | 'decimal';
   } | null>(null);
 
   // Reusable confirmation modal state
@@ -281,7 +281,7 @@ const SimpleApp: React.FC = () => {
   };
 
   // Simplified input prompt with validation
-  const showInput = (title: string, placeholder: string, onSubmit: (value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric') => {
+  const showInput = (title: string, placeholder: string, onSubmit: (value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric' | 'decimal') => {
     setInputValue(''); // Clear previous input
     setInputPrompt({
       title,
@@ -779,6 +779,7 @@ const SimpleApp: React.FC = () => {
               name="adminPin"
               type="password"
               inputMode="numeric"
+              pattern="[0-9]*"
               placeholder="PIN-kod"
               value={adminPin}
               onChange={(e) => setAdminPin(e.target.value)}
@@ -864,7 +865,7 @@ const SimpleApp: React.FC = () => {
                   onClick={() => {
                     showInput('Klassnamn (t.ex. 19A, 18B):', 'Födelseår + bokstav...', (name) => {
                       addClass(name.toUpperCase());
-                    });
+                    }, 5, 'decimal');
                   }}
                   className="w-full mb-4 p-3 bg-green-500 text-white rounded font-semibold active:scale-95 transition-transform duration-75"
                 >
