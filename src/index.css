@@ -34,8 +34,13 @@ body {
 }
 
 /* Prevent zoom on input focus - MUST be 16px or larger */
-input, select, textarea, button {
+input, select, textarea {
   font-size: 16px !important;
+  touch-action: manipulation !important;
+}
+
+/* Only apply touch-action to buttons, not font-size override */
+button {
   touch-action: manipulation !important;
 }
 
