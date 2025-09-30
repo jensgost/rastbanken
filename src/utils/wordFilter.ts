@@ -7,11 +7,13 @@
 const swedishBlacklist = [
   // Profanity and vulgar terms
   'fan', 'skit', 'satan', 'helvete', 'jävla', 'jävel', 'jävlar', 'kuk', 'fitta', 'hora',
-  'slampa', 'knulla', 'runk', 'pulla', 'bajsa', 'kiss', 'piss', 'röv', 'arsle',
+  'slampa', 'knulla', 'runk', 'pulla', 'bajsa', 'kiss', 'piss', 'röv', 'arsle', 'bajs',
+  'sug',
 
   // Offensive/derogatory terms
   'idiot', 'mongo', 'cp', 'handikappad', 'cancer', 'aids', 'kreft', 'dö', 'död',
   'självmord', 'mörda', 'våldta', 'bög', 'bögen', 'hora', 'blatte', 'neger', 'svartskalle',
+  'nörd', 'tönt',
 
   // Variations and slang
   'faen', 'fy fan', 'javla', 'javlar', 'kuksugare', 'fitthuvud', 'horunge',
@@ -26,11 +28,12 @@ const englishBlacklist = [
 
   // Sexual/vulgar terms
   'cock', 'dick', 'penis', 'pussy', 'vagina', 'tits', 'boobs', 'sex', 'sexy',
-  'whore', 'slut', 'prostitute', 'rape', 'naked', 'nude',
+  'whore', 'slut', 'prostitute', 'rape', 'naked', 'nude', 'blow', 'bj', 'blowjob',
+  'pimp', 'fist',
 
   // Offensive/derogatory terms
   'bastard', 'moron', 'retard', 'retarded', 'stupid', 'idiot', 'loser', 'kill',
-  'murder', 'suicide', 'nazi', 'hitler', 'terrorist', 'bomb',
+  'murder', 'suicide', 'nazi', 'hitler', 'terrorist', 'bomb', 'nerd',
 
   // Discriminatory terms
   'gay', 'fag', 'faggot', 'homo', 'lesbian', 'dyke', 'nigger', 'nigga', 'chink', 'spic',
