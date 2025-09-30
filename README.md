@@ -93,8 +93,8 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
    - Tryck på "Låna"-knappen
    - Välj din klass
    - Välj ditt namn
-   - Välj redskap att låna
-   - Ange antal som behövs
+   - Tryck på redskap att låna
+   - Tryck flera gånger för att låna fler av samma redskap
 
 2. **Lämna Tillbaka Redskap**
    - Tryck på "Återlämna"-knappen på startsidan

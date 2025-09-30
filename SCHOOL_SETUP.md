@@ -60,7 +60,7 @@ Din app blir redo på: `https://dittanvändarnamn.github.io/rastbanken/`
 ### För Elever:
 1. **Öppna Appen**: Tryck på hemskärmsikonen
 2. **Välj Din Klass**: Från huvudskärmen
-3. **Låna Redskap**: Välj sak, ange antal
+3. **Låna Redskap**: Tryck på sak, tryck flera gånger för fler
 4. **Lämna Tillbaka Redskap**: Samma process när du är klar
 
 ## 📱 Daglig Användning
