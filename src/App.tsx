@@ -844,7 +844,7 @@ const SimpleApp: React.FC = () => {
                       }
                       localStorage.setItem('adminPin', newPin);
                       showConfirmation('PIN uppdaterad!', 'Ny admin PIN är sparad');
-                    }, PIN_LENGTH);
+                    }, PIN_LENGTH, 'numeric');
                   }}
                   className="px-4 py-2 bg-blue-500 text-white rounded active:scale-95 transition-transform"
                 >
