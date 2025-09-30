@@ -13,10 +13,11 @@ Den här guiden hjälper skolor att få igång Rastbanken på 5 minuter eller mi
 4. App-ikonen visas på din hemskärm
 5. Tryck på ikonen för att öppna appen - den fungerar offline!
 
-### Standardinställningar:
-- **Admin-PIN**: 1234 (ändra detta i admininställningar)
+### Första användning:
+- **Admin-PIN**: Du skapar din egen PIN första gången (appen guidar dig)
 - **Redskap**: Fotbollar, hopprep, frisbees, etc.
 - **Klasser**: Du kan lägga till dina egna klasser
+- **Behörigheter**: Som standard kan elever lägga till namn/redskap (kan ändras)
 
 ## 🔧 Alternativ 2: Din Egen Version
 
@@ -49,11 +50,12 @@ Din app blir redo på: `https://dittanvändarnamn.github.io/rastbanken/`
 ## 🎯 Första Dagens Inställning
 
 ### För Lärare:
-1. **Åtkomst till Adminpanel**: Ange PIN 1234
-2. **Ändra Admin-PIN**: Gå till Admin → Ändra PIN
+1. **Första gången**: Skapa din egen admin-PIN (appen guidar dig)
+2. **Åtkomst till Adminpanel**: Ange din admin-PIN
 3. **Lägg till Dina Klasser**: Admin → Klasser → Lägg till Klass
 4. **Granska Redskap**: Kolla vad som finns, lägg till saknade saker
-5. **Testa med Elever**: Gör en snabb demo
+5. **Hantera Behörigheter**: Välj om elever kan lägga till namn/redskap eller endast admin
+6. **Testa med Elever**: Gör en snabb demo
 
 ### För Elever:
 1. **Öppna Appen**: Tryck på hemskärmsikonen
@@ -73,6 +75,7 @@ Din app blir redo på: `https://dittanvändarnamn.github.io/rastbanken/`
 - ✅ Övervaka all låneaktivitet
 - ✅ Lägga till/ta bort redskap
 - ✅ Hantera klasslistor
+- ✅ Styra vem som kan lägga till namn/redskap
 - ✅ Återställa data för nya terminer
 - ✅ Visa användningsstatistik
 

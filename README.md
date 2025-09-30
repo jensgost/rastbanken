@@ -90,33 +90,43 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
 
 ### För Elever
 1. **Låna Redskap**
-   - Välj din klass från listan
+   - Tryck på "Låna"-knappen
+   - Välj din klass
+   - Välj ditt namn
    - Välj redskap att låna
    - Ange antal som behövs
-   - Bekräfta utlåning
 
 2. **Lämna Tillbaka Redskap**
-   - Välj din klass
-   - Välj redskap att lämna tillbaka
-   - Ange antal som lämnas tillbaka
-   - Bekräfta återlämning
+   - Tryck på "Återlämna"-knappen på startsidan
+   - Hitta ditt namn och det redskap du lånat
+   - Tryck på det för att lämna tillbaka
 
 ### För Lärare/Administratörer
-1. **Åtkomst till Adminpanel**
-   - Ange admin-PIN (standard: 1234)
+1. **Första gången (engångsuppsättning)**
+   - Appen visar automatiskt en välkomstskärm
+   - Skapa din egen 4-siffriga admin-PIN
+   - PIN:en sparas lokalt på enheten
+
+2. **Åtkomst till Adminpanel**
+   - Ange din admin-PIN
    - Få tillgång till alla hanteringsfunktioner
 
-2. **Hantera Klasser**
+3. **Hantera Klasser**
    - Lägg till nya klasser
    - Visa klassers lånesstatus
    - Övervaka redskapsanvändning
 
-3. **Hantera Redskap**
+4. **Hantera Redskap**
    - Lägg till nya redskapstyper
    - Sätt kvantitetsgränser
    - Visa aktuell tillgänglighet
 
-4. **Återställ Data**
+5. **Hantera Behörigheter**
+   - Välj om elever kan lägga till nya namn och redskap
+   - Eller begränsa detta till endast administratörer
+   - Växla mellan öppen och begränsad åtkomst
+
+6. **Återställ Data**
    - Rensa alla låneregister
    - Återställ för ny skoltermin
 
@@ -147,46 +157,12 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
 - **Inga Externa Förfrågningar**: Komplett offline-drift
 - **Endast Lokal Data**: Ingen dataöverföring till externa servrar
 
-## 🤝 Bidrag
-
-Vi välkomnar bidrag från andra skolor och utvecklare!
-
-1. Kopiera (fork) repositoryt
-2. Skapa en funktionsgren
-3. Gör dina ändringar
-4. Testa noggrant
-5. Skicka en pull request
-
-### Idéer för Bidrag
-- Ytterligare språkstöd
-- Nya redskapskateorier
-- Förbättrade rapportfunktioner
-- Tillgänglighetsförbättringar
-- Visuella teman för olika skolor
-
-## 📞 Support
-
-### För Skolor
-- **Tekniska Problem**: Skapa ett issue på GitHub
-- **Funktionsförfrågningar**: Öppna en diskussion på GitHub
-- **Implementeringshjälp**: Kontakta via GitHub issues
-
-### För Utvecklare
-- **Kodfrågor**: Kolla befintliga issues eller skapa nya
-- **Dokumentation**: All teknisk dokumentation i `/docs`-mappen
-- **API-referens**: Se TypeScript-definitioner i källkoden
 
 ## 📄 Licens
 
 Detta projekt är öppen källkod och tillgängligt under [MIT-licensen](LICENSE).
 
 Gratis för alla utbildningsinstitutioner att använda, modifiera och distribuera.
-
-## 🙏 Erkännanden
-
-Skapat av en svensk skola som ville modernisera rastgårdsredskapshantering samtidigt som enkelhet och tillförlitlighet behölls.
-
-Speciellt tack till lärare och elever som testade och gav feedback under utvecklingen.
 
 ---
 

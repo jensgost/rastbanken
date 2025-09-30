@@ -30,7 +30,7 @@ const checkPin = (pin: string) => {
   return simpleHash === '==AMxkTM';
 };
 
-type Screen = 'start' | 'borrow-class' | 'borrow-student' | 'borrow-equipment' | 'return' | 'admin' | 'admin-dashboard';
+type Screen = 'start' | 'borrow-class' | 'borrow-student' | 'borrow-equipment' | 'return' | 'admin' | 'admin-dashboard' | 'first-time-setup';
 
 const SimpleApp: React.FC = () => {
   const { classes, students, equipment, loans, loading, createLoan, returnLoan, addStudent, addEquipment, deleteStudent, deleteClass, addClass, deleteEquipment, updateEquipment, resetAllData } = useApp();
@@ -237,10 +237,31 @@ const SimpleApp: React.FC = () => {
     );
   }, [memoizedStudents, studentSearchTerm, memoizedClasses]);
 
-  const [screen, setScreen] = useState<Screen>('start');
+  // Check if first-time setup is needed
+  const needsSetup = !localStorage.getItem('adminPin');
+  const [screen, setScreen] = useState<Screen>(needsSetup ? 'first-time-setup' : 'start');
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [adminPin, setAdminPin] = useState('');
+
+  // Permission setting - whether regular users can create new students/equipment
+  const [allowUserCreation, setAllowUserCreation] = useState(() => {
+    const stored = localStorage.getItem('allowUserCreation');
+    return stored !== null ? stored === 'true' : true; // Default to true
+  });
+
+  // Toggle permission setting
+  const toggleUserCreation = () => {
+    const newValue = !allowUserCreation;
+    setAllowUserCreation(newValue);
+    localStorage.setItem('allowUserCreation', newValue.toString());
+    showConfirmation(
+      'Inställning uppdaterad!',
+      newValue
+        ? 'Elever kan nu lägga till nya namn och redskap'
+        : 'Endast admin kan nu lägga till nya namn och redskap'
+    );
+  };
 
 
 
@@ -300,8 +321,8 @@ const SimpleApp: React.FC = () => {
           showConfirmation('Fel', 'För långt namn (max 30 tecken)');
           return;
         }
-        // Check for inappropriate words
-        if (containsInappropriateWords(sanitized)) {
+        // Check for inappropriate words (only for text inputs, not numeric)
+        if (inputMode !== 'numeric' && inputMode !== 'decimal' && containsInappropriateWords(sanitized)) {
           showConfirmation('Fel', getInappropriateWordError());
           return;
         }
@@ -454,6 +475,56 @@ const SimpleApp: React.FC = () => {
     );
   }
 
+  // FIRST-TIME SETUP SCREEN
+  if (screen === 'first-time-setup') {
+    return (
+      <div className="min-h-screen bg-sky-100 p-8 flex items-center justify-center">
+        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Välkommen till Rastbanken!
+          </h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Skapa en 4-siffrig admin-PIN för att komma igång
+          </p>
+          <input
+            type="tel"
+            inputMode="numeric"
+            placeholder="Ange 4-siffrig PIN"
+            maxLength={4}
+            value={adminPin}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '');
+              setAdminPin(value);
+            }}
+            className="w-full p-4 text-2xl text-center border-2 border-gray-300 rounded-lg mb-6 focus:border-blue-500 focus:outline-none"
+            autoFocus
+          />
+          <button
+            onClick={() => {
+              if (adminPin.length !== 4) {
+                showConfirmation('Fel', 'PIN måste vara 4 siffror');
+                return;
+              }
+
+              localStorage.setItem('adminPin', adminPin);
+              setAdminPin('');
+              setScreen('start');
+              showConfirmation('Klart!', 'Din admin-PIN är sparad. Du kan nu använda appen.');
+            }}
+            disabled={adminPin.length !== 4}
+            className={`w-full p-4 text-xl font-bold rounded-lg transition-all ${
+              adminPin.length === 4
+                ? 'bg-green-500 text-white active:scale-95'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            Spara PIN och Fortsätt
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // START SCREEN
   if (screen === 'start') {
     return (
@@ -580,17 +651,19 @@ const SimpleApp: React.FC = () => {
                 </button>
               ))}
 
-              <button
-                onClick={() => {
-                  showInput('Vad heter du?', 'Skriv ditt namn här...', (name) => {
-                    const formattedName = toCamelCase(name);
-                    addStudent(formattedName, selectedClass.id);
-                  });
-                }}
-                className="p-4 bg-gray-100 rounded-xl text-xl font-semibold border-2 border-dashed border-gray-300 h-20 flex items-center justify-center text-center"
-              >
-                + Lägg till mitt namn
-              </button>
+              {allowUserCreation && (
+                <button
+                  onClick={() => {
+                    showInput('Vad heter du?', 'Skriv ditt namn här...', (name) => {
+                      const formattedName = toCamelCase(name);
+                      addStudent(formattedName, selectedClass.id);
+                    });
+                  }}
+                  className="p-4 bg-gray-100 rounded-xl text-xl font-semibold border-2 border-dashed border-gray-300 h-20 flex items-center justify-center text-center"
+                >
+                  + Lägg till mitt namn
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -669,28 +742,30 @@ const SimpleApp: React.FC = () => {
                 </button>
               ))}
 
-              <button
-                onClick={() => {
-                  showInput('Vad heter redskapet?', 'T.ex. Fotboll, Hopprep...', (equipmentName) => {
-                    const formattedName = toCamelCase(equipmentName);
-                    // Close the first modal before opening the second
-                    setInputPrompt(null);
-                    setTimeout(() => {
-                      showInput('Hur många finns det?', 'Ange antal...', (quantityStr) => {
-                        const quantity = parseInt(quantityStr);
-                        if (isNaN(quantity) || quantity < 1) {
-                          showConfirmation('Fel', 'Ange ett giltigt antal (minst 1)');
-                          return;
-                        }
-                        addEquipment(formattedName, 'Sport', quantity);
-                      }, 3, 'numeric');
-                    }, 100);
-                  });
-                }}
-                className="p-6 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
-              >
-                + Lägg till redskap
-              </button>
+              {allowUserCreation && (
+                <button
+                  onClick={() => {
+                    showInput('Vad heter redskapet?', 'T.ex. Fotboll, Hopprep...', (equipmentName) => {
+                      const formattedName = toCamelCase(equipmentName);
+                      // Close the first modal before opening the second
+                      setInputPrompt(null);
+                      setTimeout(() => {
+                        showInput('Hur många finns det?', 'Ange antal...', (quantityStr) => {
+                          const quantity = parseInt(quantityStr);
+                          if (isNaN(quantity) || quantity < 1) {
+                            showConfirmation('Fel', 'Ange ett giltigt antal (minst 1)');
+                            return;
+                          }
+                          addEquipment(formattedName, 'Sport', quantity);
+                        }, 3, 'numeric');
+                      }, 100);
+                    });
+                  }}
+                  className="p-6 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
+                >
+                  + Lägg till redskap
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -849,6 +924,16 @@ const SimpleApp: React.FC = () => {
                   className="px-4 py-2 bg-blue-500 text-white rounded active:scale-95 transition-transform"
                 >
                   Ändra PIN
+                </button>
+                <button
+                  onClick={toggleUserCreation}
+                  className={`px-4 py-2 rounded active:scale-95 transition-transform ${
+                    allowUserCreation
+                      ? 'bg-green-500 text-white'
+                      : 'bg-black text-white'
+                  }`}
+                >
+                  {allowUserCreation ? 'Elever kan skapa ✓' : 'Endast admin skapar ✗'}
                 </button>
                 <button
                   onClick={() => setScreen('start')}
