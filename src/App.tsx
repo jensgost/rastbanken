@@ -6,6 +6,7 @@
 import React, { useState, useMemo } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import type { Class, Student, Equipment } from './utils/db';
+import { containsInappropriateWords, getInappropriateWordError } from './utils/wordFilter';
 
 // Constants
 // Master PIN is handled in checkPin function for security
@@ -297,6 +298,11 @@ const SimpleApp: React.FC = () => {
         }
         if (sanitized.length > 30) {
           showConfirmation('Fel', 'För långt namn (max 30 tecken)');
+          return;
+        }
+        // Check for inappropriate words
+        if (containsInappropriateWords(sanitized)) {
+          showConfirmation('Fel', getInappropriateWordError());
           return;
         }
         onSubmit(sanitized);
