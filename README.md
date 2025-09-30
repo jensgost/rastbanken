@@ -86,110 +86,110 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
    - Uppdatera ordfiltret i `src/utils/wordFilter.ts`
    - Modifiera redskapsslistan i `src/utils/seedData.ts`
 
-## 📖 How to Use
+## 📖 Hur Man Använder
 
-### For Students
-1. **Borrow Equipment**
-   - Select your class from the list
-   - Choose equipment to borrow
-   - Enter quantity needed
-   - Confirm borrowing
+### För Elever
+1. **Låna Redskap**
+   - Välj din klass från listan
+   - Välj redskap att låna
+   - Ange antal som behövs
+   - Bekräfta utlåning
 
-2. **Return Equipment**
-   - Select your class
-   - Choose equipment to return
-   - Enter quantity returning
-   - Confirm return
+2. **Lämna Tillbaka Redskap**
+   - Välj din klass
+   - Välj redskap att lämna tillbaka
+   - Ange antal som lämnas tillbaka
+   - Bekräfta återlämning
 
-### For Teachers/Administrators
-1. **Access Admin Panel**
-   - Enter admin PIN (default: 1234)
-   - Access full management features
+### För Lärare/Administratörer
+1. **Åtkomst till Adminpanel**
+   - Ange admin-PIN (standard: 1234)
+   - Få tillgång till alla hanteringsfunktioner
 
-2. **Manage Classes**
-   - Add new classes
-   - View class borrowing status
-   - Monitor equipment usage
+2. **Hantera Klasser**
+   - Lägg till nya klasser
+   - Visa klassers lånesstatus
+   - Övervaka redskapsanvändning
 
-3. **Manage Equipment**
-   - Add new equipment types
-   - Set quantity limits
-   - View current availability
+3. **Hantera Redskap**
+   - Lägg till nya redskapstyper
+   - Sätt kvantitetsgränser
+   - Visa aktuell tillgänglighet
 
-4. **Reset Data**
-   - Clear all borrowing records
-   - Reset for new school term
+4. **Återställ Data**
+   - Rensa alla låneregister
+   - Återställ för ny skoltermin
 
-## 🔧 Technical Details
+## 🔧 Tekniska Detaljer
 
-### Technology Stack
+### Teknikstack
 - **Frontend**: React 18 + TypeScript
 - **Styling**: Tailwind CSS
 - **Build Tool**: Vite
-- **Storage**: IndexedDB (local browser database)
-- **PWA**: Service Worker for offline functionality
-- **Deployment**: GitHub Pages (free hosting)
+- **Lagring**: IndexedDB (lokal webbläsardatabas)
+- **PWA**: Service Worker för offline-funktionalitet
+- **Distribution**: GitHub Pages (gratis hosting)
 
-### Browser Support
+### Webbläsarstöd
 - **iOS Safari** 12+ (iPads, iPhones)
 - **Chrome** 80+ (Android, Windows, Mac)
 - **Firefox** 78+ (Windows, Mac, Linux)
 - **Edge** 80+ (Windows, Mac)
 
-### Storage
-- **Local Storage**: All data stored in browser's IndexedDB
-- **Capacity**: ~250MB+ available for app data
-- **Persistence**: Data survives browser restarts and device reboots
+### Lagring
+- **Lokal Lagring**: All data lagras i webbläsarens IndexedDB
+- **Kapacitet**: ~250MB+ tillgängligt för appdata
+- **Beständighet**: Data överlever webbläsaromstarter och enhetsomstarter
 
-### Security Features
-- **Content Filtering**: Blocks inappropriate language (Swedish/English)
-- **Admin Protection**: PIN-protected admin functions
-- **No External Requests**: Complete offline operation
-- **Local Data Only**: No data transmission to external servers
+### Säkerhetsfunktioner
+- **Innehållsfiltrering**: Blockerar olämpligt språk (svenska/engelska)
+- **Adminskydd**: PIN-skyddade adminfunktioner
+- **Inga Externa Förfrågningar**: Komplett offline-drift
+- **Endast Lokal Data**: Ingen dataöverföring till externa servrar
 
-## 🤝 Contributing
+## 🤝 Bidrag
 
-We welcome contributions from other schools and developers!
+Vi välkomnar bidrag från andra skolor och utvecklare!
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1. Kopiera (fork) repositoryt
+2. Skapa en funktionsgren
+3. Gör dina ändringar
+4. Testa noggrant
+5. Skicka en pull request
 
-### Ideas for Contributions
-- Additional language support
-- New equipment categories
-- Enhanced reporting features
-- Accessibility improvements
-- Visual themes for different schools
+### Idéer för Bidrag
+- Ytterligare språkstöd
+- Nya redskapskateorier
+- Förbättrade rapportfunktioner
+- Tillgänglighetsförbättringar
+- Visuella teman för olika skolor
 
 ## 📞 Support
 
-### For Schools
-- **Technical Issues**: Create an issue on GitHub
-- **Feature Requests**: Open a discussion on GitHub
-- **Implementation Help**: Contact via GitHub issues
+### För Skolor
+- **Tekniska Problem**: Skapa ett issue på GitHub
+- **Funktionsförfrågningar**: Öppna en diskussion på GitHub
+- **Implementeringshjälp**: Kontakta via GitHub issues
 
-### For Developers
-- **Code Questions**: Check existing issues or create new ones
-- **Documentation**: All technical docs in `/docs` folder
-- **API Reference**: See TypeScript definitions in source
+### För Utvecklare
+- **Kodfrågor**: Kolla befintliga issues eller skapa nya
+- **Dokumentation**: All teknisk dokumentation i `/docs`-mappen
+- **API-referens**: Se TypeScript-definitioner i källkoden
 
-## 📄 License
+## 📄 Licens
 
-This project is open source and available under the [MIT License](LICENSE).
+Detta projekt är öppen källkod och tillgängligt under [MIT-licensen](LICENSE).
 
-Free for all educational institutions to use, modify, and distribute.
+Gratis för alla utbildningsinstitutioner att använda, modifiera och distribuera.
 
-## 🙏 Credits
+## 🙏 Erkännanden
 
-Created by a Swedish school looking to modernize playground equipment management while maintaining simplicity and reliability.
+Skapat av en svensk skola som ville modernisera rastgårdsredskapshantering samtidigt som enkelhet och tillförlitlighet behölls.
 
-Special thanks to the teachers and students who tested and provided feedback during development.
+Speciellt tack till lärare och elever som testade och gav feedback under utvecklingen.
 
 ---
 
-**Ready to modernize your school's equipment management? Try Rastbanken today!** 🚀
+**Redo att modernisera din skolas redskapshantering? Prova Rastbanken idag!** 🚀
 
-*For questions or support, please create an issue on GitHub.*
+*För frågor eller support, vänligen skapa ett issue på GitHub.*
