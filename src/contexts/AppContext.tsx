@@ -4,13 +4,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans, clearAllData } from '@/utils/db';
 import type { Class, Student, Equipment, Loan } from '@/utils/db';
-
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
-
-const getNextColor = (existingClasses: Class[]): string => {
-  const colorIndex = existingClasses.length % COLORS.length;
-  return COLORS[colorIndex];
-};
+import { getNextColor } from '@/constants/colors';
 
 interface AppState {
   // Data

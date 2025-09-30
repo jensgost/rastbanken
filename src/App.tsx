@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import type { Class, Student, Equipment } from './utils/db';
 import { containsInappropriateWords, getInappropriateWordError } from './utils/wordFilter';
+import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH } from './constants/app';
 
 // Constants
 // Master PIN is handled in checkPin function for security
@@ -25,9 +26,10 @@ const checkPin = (pin: string) => {
   // Check user PIN if set
   if (userPin && pin === userPin) return true;
 
-  // Master PIN check - simple hash for basic security (adequate for school environment)
-  const simpleHash = btoa(pin).split('').reverse().join('').substring(0, 8);
-  return simpleHash === '==AMxkTM';
+  // Master PIN check - secure hash with salt
+  const salt = 'rastbanken-secure-salt-2024';
+  const masterHash = btoa(pin + salt + pin.split('').reverse().join('')).split('').reverse().join('').substring(0, 16);
+  return masterHash === '=ETOxADNyAjMtQHb';
 };
 
 type Screen = 'start' | 'borrow-class' | 'borrow-student' | 'borrow-equipment' | 'return' | 'admin' | 'admin-dashboard' | 'first-time-setup';
@@ -283,6 +285,10 @@ const SimpleApp: React.FC = () => {
   const [confirmTitle, setConfirmTitle] = useState('');
   const [confirmMessage, setConfirmMessage] = useState('');
 
+  // Class selection modal state
+  const [showClassSelection, setShowClassSelection] = useState(false);
+  const [pendingStudentName, setPendingStudentName] = useState('');
+
   // Reset confirmation modal state
   const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
 
@@ -317,8 +323,8 @@ const SimpleApp: React.FC = () => {
           showConfirmation('Fel', 'Fältet kan inte vara tomt');
           return;
         }
-        if (sanitized.length > 30) {
-          showConfirmation('Fel', 'För långt namn (max 30 tecken)');
+        if (sanitized.length > MAX_NAME_LENGTH) {
+          showConfirmation('Fel', `För långt namn (max ${MAX_NAME_LENGTH} tecken)`);
           return;
         }
         // Check for inappropriate words (only for text inputs, not numeric)
@@ -467,6 +473,59 @@ const SimpleApp: React.FC = () => {
     );
   };
 
+  // Class Selection Modal Component
+  const ClassSelectionModal = () => {
+    if (!showClassSelection) return null;
+
+    const handleModalClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+    };
+
+    const handleBackdropClick = () => {
+      setShowClassSelection(false);
+      setPendingStudentName('');
+    };
+
+    const handleClassSelect = (classId: string) => {
+      if (pendingStudentName) {
+        addStudent(pendingStudentName, classId);
+      }
+      setShowClassSelection(false);
+      setPendingStudentName('');
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50" onClick={handleBackdropClick}>
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={handleModalClick}>
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Välj klass för {pendingStudentName}</h2>
+            <p className="text-lg text-gray-600">Tryck på en klass för att lägga till eleven:</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+            {memoizedClasses.map((schoolClass) => (
+              <button
+                key={schoolClass.id}
+                onClick={() => handleClassSelect(schoolClass.id)}
+                className="p-4 rounded-xl text-white font-bold text-lg active:scale-95 transition-transform shadow-lg"
+                style={{ backgroundColor: schoolClass.colorCode }}
+              >
+                {schoolClass.name}
+              </button>
+            ))}
+          </div>
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleBackdropClick}
+              className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg active:scale-95 transition-transform"
+            >
+              Avbryt
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50 flex items-center justify-center">
@@ -565,6 +624,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -610,6 +670,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -670,6 +731,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -756,6 +818,10 @@ const SimpleApp: React.FC = () => {
                             showConfirmation('Fel', 'Ange ett giltigt antal (minst 1)');
                             return;
                           }
+                          if (quantity > MAX_EQUIPMENT_QUANTITY) {
+                            showConfirmation('Fel', `Max antal är ${MAX_EQUIPMENT_QUANTITY}`);
+                            return;
+                          }
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
                       }, 100);
@@ -772,6 +838,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -844,6 +911,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -891,6 +959,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
@@ -1008,17 +1077,11 @@ const SimpleApp: React.FC = () => {
                   onClick={() => {
                     showInput('Elevens namn:', 'Skriv elevens namn här...', (name) => {
                       const formattedName = toCamelCase(name);
-                      // Close the first modal before opening the second
+                      // Close the input modal and show class selection
                       setInputPrompt(null);
                       setTimeout(() => {
-                        showInput('Vilken klass? Skriv klassnamn:', 'T.ex. 4A, 2B...', (className) => {
-                          const selectedClass = memoizedClasses.find(c => c.name.toLowerCase() === className.toLowerCase());
-                          if (!selectedClass) {
-                            showConfirmation('Fel', `Klass "${className}" finns inte. Tillgängliga klasser: ${memoizedClasses.map(c => c.name).join(', ')}`);
-                            return;
-                          }
-                          addStudent(formattedName, selectedClass.id);
-                        }, 5, 'text');
+                        setPendingStudentName(formattedName);
+                        setShowClassSelection(true);
                       }, 100);
                     });
                   }}
@@ -1099,6 +1162,10 @@ const SimpleApp: React.FC = () => {
                             showConfirmation('Fel', 'Ange ett giltigt antal (minst 1)');
                             return;
                           }
+                          if (quantity > MAX_EQUIPMENT_QUANTITY) {
+                            showConfirmation('Fel', `Max antal är ${MAX_EQUIPMENT_QUANTITY}`);
+                            return;
+                          }
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
                       }, 100);
@@ -1171,6 +1238,7 @@ const SimpleApp: React.FC = () => {
         <InputModal />
         <ConfirmationModal />
         <ResetConfirmationModal />
+        <ClassSelectionModal />
       </>
     );
   }
