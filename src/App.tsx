@@ -10,15 +10,21 @@ import { containsInappropriateWords, getInappropriateWordError } from './utils/w
 import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH, FADE_DURATION, MODAL_AUTO_HIDE_DURATION, PIN_LENGTH } from './constants/app';
 
 
+// Simple hash function for PIN storage (basic obfuscation for offline app)
+const hashPin = (pin: string): string => {
+  const salt = 'rastbanken-salt-2024';
+  return btoa(salt + pin + pin.split('').reverse().join(''));
+};
+
 // Simple admin PIN check - secure enough for school app
 const checkPin = (pin: string) => {
-  const userPin = localStorage.getItem('adminPin');
+  const storedHashedPin = localStorage.getItem('adminPin');
 
   // Input validation
   if (!/^\d{4}$/.test(pin)) return false;
 
-  // Check user PIN if set
-  if (userPin && pin === userPin) return true;
+  // Check user PIN if set (compare hashed values)
+  if (storedHashedPin && hashPin(pin) === storedHashedPin) return true;
 
   // Master PIN check - secure hash with salt
   const salt = 'rastbanken-secure-salt-2024';
@@ -380,6 +386,7 @@ const SimpleApp: React.FC = () => {
                 setInputValue('');
               }}
               className="flex-1 p-4 bg-gray-200 rounded-xl text-xl font-semibold"
+              aria-label="Avbryt och stäng dialogrutan"
             >
               Avbryt
             </button>
@@ -387,6 +394,7 @@ const SimpleApp: React.FC = () => {
               onClick={handleSubmit}
               disabled={!inputValue.trim()}
               className="flex-1 p-4 bg-green-500 text-white rounded-xl text-xl font-semibold disabled:bg-gray-300"
+              aria-label="Bekräfta och spara inmatning"
             >
               OK
             </button>
@@ -451,12 +459,14 @@ const SimpleApp: React.FC = () => {
               <button
                 onClick={() => setShowResetConfirmModal(false)}
                 className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg active:scale-95 transition-transform"
+                aria-label="Avbryt radering av data"
               >
                 Avbryt
               </button>
               <button
                 onClick={handleReset}
                 className="px-6 py-2 bg-red-500 text-white rounded-lg active:scale-95 transition-transform"
+                aria-label="Bekräfta och radera all data permanent"
               >
                 Ja, radera allt
               </button>
@@ -511,6 +521,7 @@ const SimpleApp: React.FC = () => {
             <button
               onClick={handleBackdropClick}
               className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg active:scale-95 transition-transform"
+              aria-label="Avbryt klassval"
             >
               Avbryt
             </button>
@@ -551,6 +562,7 @@ const SimpleApp: React.FC = () => {
             }}
             className="w-full p-4 text-2xl text-center border-2 border-gray-300 rounded-lg mb-6 focus:border-blue-500 focus:outline-none"
             autoFocus
+            aria-label="Ange din nya 4-siffriga admin PIN-kod"
           />
           <button
             onClick={() => {
@@ -559,7 +571,7 @@ const SimpleApp: React.FC = () => {
                 return;
               }
 
-              localStorage.setItem('adminPin', adminPin);
+              localStorage.setItem('adminPin', hashPin(adminPin));
               setAdminPin('');
               setScreen('start');
               showConfirmation('Klart!', 'Din admin-PIN är sparad. Du kan nu använda appen.');
@@ -631,7 +643,11 @@ const SimpleApp: React.FC = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-4xl font-bold">Välj din klass</h1>
-              <button onClick={() => setScreen('start')} className="px-4 py-2 bg-gray-200 rounded">
+              <button
+                onClick={() => setScreen('start')}
+                className="px-4 py-2 bg-gray-200 rounded"
+                aria-label="Gå tillbaka till startsidan"
+              >
                 ← Tillbaka
               </button>
             </div>
@@ -845,7 +861,11 @@ const SimpleApp: React.FC = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-4xl font-bold">Lämna tillbaka</h1>
-              <button onClick={() => setScreen('start')} className="px-4 py-2 bg-gray-200 rounded">
+              <button
+                onClick={() => setScreen('start')}
+                className="px-4 py-2 bg-gray-200 rounded"
+                aria-label="Gå tillbaka till startsidan"
+              >
                 ← Tillbaka
               </button>
             </div>
@@ -928,6 +948,7 @@ const SimpleApp: React.FC = () => {
               onChange={(e) => setAdminPin(e.target.value)}
               className="w-full p-3 border rounded text-center text-xl mb-4"
               maxLength={PIN_LENGTH}
+              aria-label="Ange admin PIN-kod för att logga in"
             />
             <button
               onClick={() => {
@@ -980,7 +1001,7 @@ const SimpleApp: React.FC = () => {
                         showConfirmation('Fel', `PIN måste vara exakt ${PIN_LENGTH} siffror`);
                         return;
                       }
-                      localStorage.setItem('adminPin', newPin);
+                      localStorage.setItem('adminPin', hashPin(newPin));
                       showConfirmation('PIN uppdaterad!', 'Ny admin PIN är sparad');
                     }, PIN_LENGTH, 'numeric');
                   }}
