@@ -38,6 +38,10 @@ dist/
 *.sln
 *.sw?
 
+# Local agent/AI configuration
+.bmad-core/
+.claude/
+
 # Vite
 .vite
 node_modules
