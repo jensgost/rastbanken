@@ -15,9 +15,11 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         // Skip waiting for faster updates
         skipWaiting: true,
-        clientsClaim: true
+        clientsClaim: true,
+        // Force cache refresh for icon change
+        cleanupOutdatedCaches: true
       },
-      includeAssets: ['rastbanken-icon-v2.svg'],
+      includeAssets: [],
       manifest: {
         name: 'Rastbanken - Skolrastgårdens Redskapsbank',
         short_name: 'Rastbanken',
@@ -30,7 +32,7 @@ export default defineConfig({
         scope: process.env.NODE_ENV === 'production' ? '/rastbanken/' : '/',
         icons: [
           {
-            src: 'rastbanken-icon-v2.svg',
+            src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚽</text></svg>",
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any maskable'
