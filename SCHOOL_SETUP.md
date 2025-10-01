@@ -14,10 +14,12 @@ Den här guiden hjälper skolor att få igång Rastbanken på 5 minuter eller mi
 5. Tryck på ikonen för att öppna appen - den fungerar offline!
 
 ### Första användning:
-- **Admin-PIN**: Du skapar din egen PIN första gången (appen guidar dig)
-- **Redskap**: Fotbollar, hopprep, frisbees, etc.
-- **Klasser**: Du kan lägga till dina egna klasser
-- **Behörigheter**: Som standard kan elever lägga till namn/redskap (kan ändras)
+- **Admin-PIN**: Du skapar din egen 4-siffriga PIN första gången (appen guidar dig)
+- **Data**: Appen startar helt tom - ingen data är förladdad
+- **Klasser**: Lägg till dina klasser via adminpanelen (t.ex. FA, 1A, 2B)
+- **Redskap**: Lägg till redskap med antal (t.ex. 5 fotbollar, 10 hopprep)
+- **Elever**: Elever kan lägga till sina namn, eller endast admin (välj i inställningar)
+- **Behörigheter**: Som standard kan elever lägga till namn/redskap (kan ändras via admin)
 
 ## 🔧 Alternativ 2: Din Egen Version
 
@@ -44,18 +46,19 @@ Din app blir redo på: `https://dittanvändarnamn.github.io/rastbanken/`
 
 ### Steg 4: Anpassa (Valfritt)
 - Ändra färger och skolnamn i `vite.config.ts`
-- Uppdatera redskaplistan i `src/utils/seedData.ts`
+- Anpassa klassfärger i `src/constants/colors.ts`
 - Modifiera ordfiltret i `src/utils/wordFilter.ts`
 
 ## 🎯 Första Dagens Inställning
 
 ### För Lärare:
-1. **Första gången**: Skapa din egen admin-PIN (appen guidar dig)
-2. **Åtkomst till Adminpanel**: Ange din admin-PIN
-3. **Lägg till Dina Klasser**: Admin → Klasser → Lägg till Klass
-4. **Granska Redskap**: Kolla vad som finns, lägg till saknade saker
-5. **Hantera Behörigheter**: Välj om elever kan lägga till namn/redskap eller endast admin
-6. **Testa med Elever**: Gör en snabb demo
+1. **Första gången**: Skapa din egen 4-siffriga admin-PIN (appen guidar dig)
+2. **Åtkomst till Adminpanel**: Tryck på ⚙️ på startsidan, ange din PIN
+3. **Lägg till Dina Klasser**: Admin → Klasser → Lägg till Klass (t.ex. FA, 1A, 2B)
+4. **Lägg till Redskap**: Admin → Redskap → Lägg till Redskap (namn + antal)
+5. **Lägg till Elever**: Admin → Elever → Lägg till Elev (eller låt elever göra det själva)
+6. **Hantera Behörigheter**: Växla mellan "Elever kan skapa" eller "Endast admin skapar"
+7. **Testa med Elever**: Gör en snabb demo av låna/återlämna
 
 ### För Elever:
 1. **Öppna Appen**: Tryck på hemskärmsikonen

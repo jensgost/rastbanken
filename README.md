@@ -84,7 +84,7 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
 4. **Anpassa för Din Skola** (valfritt)
    - Redigera `vite.config.ts` för att ändra appnamn och färger
    - Uppdatera ordfiltret i `src/utils/wordFilter.ts`
-   - Modifiera redskapsslistan i `src/utils/seedData.ts`
+   - Anpassa temat och färgerna i `src/constants/colors.ts`
 
 ## 📖 Hur Man Använder
 
@@ -105,30 +105,37 @@ Besök appen: [https://jensgost.github.io/rastbanken/](https://jensgost.github.i
 1. **Första gången (engångsuppsättning)**
    - Appen visar automatiskt en välkomstskärm
    - Skapa din egen 4-siffriga admin-PIN
-   - PIN:en sparas lokalt på enheten
+   - PIN:en sparas lokalt på enheten (hashad för säkerhet)
 
 2. **Åtkomst till Adminpanel**
    - Ange din admin-PIN
    - Få tillgång till alla hanteringsfunktioner
 
 3. **Hantera Klasser**
-   - Lägg till nya klasser
-   - Visa klassers lånesstatus
-   - Övervaka redskapsanvändning
+   - Lägg till nya klasser (t.ex. 1A, 2B, FA)
+   - Ta bort klasser när de inte längre används
+   - Klasser får automatiskt unika färger
 
-4. **Hantera Redskap**
-   - Lägg till nya redskapstyper
-   - Sätt kvantitetsgränser
-   - Visa aktuell tillgänglighet
+4. **Hantera Elever**
+   - Lägg till elevnamn för varje klass
+   - Sök och filtrera elever
+   - Ta bort elever (returnerar automatiskt deras lån)
 
-5. **Hantera Behörigheter**
+5. **Hantera Redskap**
+   - Lägg till nya redskapstyper med kvantitet
+   - Justera antal tillgängliga redskap
+   - Ta bort redskap som inte längre används
+   - Återlämna alla utlånade redskap med ett knapptryck
+
+6. **Hantera Behörigheter**
    - Välj om elever kan lägga till nya namn och redskap
    - Eller begränsa detta till endast administratörer
    - Växla mellan öppen och begränsad åtkomst
 
-6. **Återställ Data**
-   - Rensa alla låneregister
+7. **Återställ Data**
+   - Rensa alla klasser, elever, redskap och låneregister
    - Återställ för ny skoltermin
+   - Varning: Detta går inte att ångra!
 
 ## 🔧 Tekniska Detaljer
 
