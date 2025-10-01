@@ -18,17 +18,17 @@ interface AppState {
 
   // Simple actions
   loadData: () => Promise<void>;
-  createLoan: (studentId: string, equipmentId: string) => Promise<void>;
-  returnLoan: (loanId: string) => Promise<void>;
-  addStudent: (name: string, classId: string) => Promise<void>;
-  addEquipment: (name: string, category: string, quantity: number) => Promise<void>;
+  createLoan: (_studentId: string, _equipmentId: string) => Promise<void>;
+  returnLoan: (_loanId: string) => Promise<void>;
+  addStudent: (_name: string, _classId: string) => Promise<void>;
+  addEquipment: (_name: string, _category: string, _quantity: number) => Promise<void>;
 
   // Admin actions
-  deleteStudent: (studentId: string) => Promise<void>;
-  deleteClass: (classId: string) => Promise<void>;
-  addClass: (name: string) => Promise<void>;
-  deleteEquipment: (equipmentId: string) => Promise<void>;
-  updateEquipment: (equipmentId: string, newQuantity: number) => Promise<void>;
+  deleteStudent: (_studentId: string) => Promise<void>;
+  deleteClass: (_classId: string) => Promise<void>;
+  addClass: (_name: string) => Promise<void>;
+  deleteEquipment: (_equipmentId: string) => Promise<void>;
+  updateEquipment: (_equipmentId: string, _newQuantity: number) => Promise<void>;
   resetAllData: () => Promise<void>;
 }
 
@@ -61,7 +61,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setEquipment(equipmentData);
       setLoans(loansData);
     } catch (error) {
-      // Error loading data - fail silently in production
+      // Error loading data - log for debugging
+      console.error('Failed to load data from database:', error);
+      alert('Kunde inte ladda data. Försök ladda om sidan.');
     } finally {
       setLoading(false);
     }

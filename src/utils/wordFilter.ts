@@ -59,12 +59,14 @@ export const containsInappropriateWords = (text: string): boolean => {
 
   const normalizedText = text.toLowerCase().trim();
 
-  // Check for exact matches and partial matches
+  // Check for whole word matches only (prevents false positives like "Sussex" containing "sex")
   return blacklistedWords.some(word => {
     const normalizedWord = word.toLowerCase();
 
-    // Check if word appears as standalone word or part of word
-    return normalizedText.includes(normalizedWord);
+    // Use word boundaries to match complete words only
+    // \b ensures the word is not part of a larger word
+    const regex = new RegExp(`\\b${normalizedWord}\\b`, 'i');
+    return regex.test(normalizedText);
   });
 };
 

@@ -7,13 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import type { Class, Student, Equipment } from './utils/db';
 import { containsInappropriateWords, getInappropriateWordError } from './utils/wordFilter';
-import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH } from './constants/app';
-
-// Constants
-// Master PIN is handled in checkPin function for security
-const FADE_DURATION = 400;
-const MODAL_AUTO_HIDE_DURATION = 3000;
-const PIN_LENGTH = 4;
+import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH, FADE_DURATION, MODAL_AUTO_HIDE_DURATION, PIN_LENGTH } from './constants/app';
 
 
 // Simple admin PIN check - secure enough for school app
@@ -275,7 +269,7 @@ const SimpleApp: React.FC = () => {
   const [inputPrompt, setInputPrompt] = useState<{
     title: string;
     placeholder: string;
-    onSubmit: (value: string) => void;
+    onSubmit: (_value: string) => void;
     maxLength?: number;
     inputMode?: 'text' | 'numeric' | 'decimal';
   } | null>(null);
@@ -309,16 +303,16 @@ const SimpleApp: React.FC = () => {
   };
 
   // Simplified input prompt with validation
-  const showInput = (title: string, placeholder: string, onSubmit: (value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric' | 'decimal') => {
+  const showInput = (title: string, placeholder: string, onSubmit: (_value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric' | 'decimal') => {
     setInputValue(''); // Clear previous input
     setInputPrompt({
       title,
       placeholder,
       maxLength,
       inputMode,
-      onSubmit: (value: string) => {
+      onSubmit: (inputValue: string) => {
         // Basic input validation
-        const sanitized = value.trim();
+        const sanitized = inputValue.trim();
         if (sanitized.length === 0) {
           showConfirmation('Fel', 'Fältet kan inte vara tomt');
           return;
