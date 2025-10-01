@@ -19,7 +19,7 @@ export default defineConfig({
         // Force cache refresh for icon change
         cleanupOutdatedCaches: true
       },
-      includeAssets: [],
+      includeAssets: ['icon-192.svg', 'icon-512.svg'],
       manifest: {
         name: 'Rastbanken - Skolrastgårdens Redskapsbank',
         short_name: 'Rastbanken',
@@ -32,10 +32,22 @@ export default defineConfig({
         scope: process.env.NODE_ENV === 'production' ? '/rastbanken/' : '/',
         icons: [
           {
-            src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚽</text></svg>",
+            src: 'icon-192.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: 'icon-512.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any'
+          },
+          {
+            src: 'icon-192.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
           }
         ],
         // Battery optimization settings
