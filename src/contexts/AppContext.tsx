@@ -5,7 +5,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans, clearAllData } from '@/utils/db';
 import type { Class, Student, Equipment, Loan } from '@/utils/db';
 import { getNextColor } from '@/constants/colors';
-import { getEquipmentImage } from '@/utils/equipmentImages';
 import { findMatchingImage } from '@/utils/equipmentImageList';
 
 interface AppState {
