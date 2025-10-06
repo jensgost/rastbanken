@@ -22,13 +22,16 @@ export const normalizeEquipmentName = (name: string): string => {
 /**
  * Get image URL for equipment name with smart matching
  * Returns the WebP image path if a match is found
+ * Properly encodes Swedish characters (å, ä, ö) for URL compatibility
  */
 export const getEquipmentImageUrl = (equipmentName: string): string | undefined => {
   const matchedImage = findMatchingImage(equipmentName);
   if (!matchedImage) {
     return undefined;
   }
-  return `/equipment-icons/${matchedImage}.webp`;
+  // Encode the filename to handle Swedish characters (å, ä, ö) and spaces
+  const encodedFilename = encodeURIComponent(matchedImage);
+  return `/equipment-icons/${encodedFilename}.webp`;
 };
 
 /**
