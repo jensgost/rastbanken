@@ -23,6 +23,7 @@ export const normalizeEquipmentName = (name: string): string => {
  * Get image URL for equipment name with smart matching
  * Returns the WebP image path if a match is found
  * Properly encodes Swedish characters (å, ä, ö) for URL compatibility
+ * Uses Vite's BASE_URL for correct path in both dev and production
  */
 export const getEquipmentImageUrl = (equipmentName: string): string | undefined => {
   const matchedImage = findMatchingImage(equipmentName);
@@ -31,7 +32,9 @@ export const getEquipmentImageUrl = (equipmentName: string): string | undefined 
   }
   // Encode the filename to handle Swedish characters (å, ä, ö) and spaces
   const encodedFilename = encodeURIComponent(matchedImage);
-  return `/equipment-icons/${encodedFilename}.webp`;
+  // Use Vite's BASE_URL which is '/' in dev and '/rastbanken/' in production
+  const baseUrl = import.meta.env.BASE_URL;
+  return `${baseUrl}equipment-icons/${encodedFilename}.webp`;
 };
 
 /**

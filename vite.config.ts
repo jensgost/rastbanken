@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         // Optimized for battery life - cache everything locally
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         // Skip waiting for faster updates
         skipWaiting: true,
         clientsClaim: true,
