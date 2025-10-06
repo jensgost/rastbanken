@@ -4,7 +4,7 @@
 
 // UI Animation timings
 export const FADE_DURATION = 400; // milliseconds
-export const MODAL_AUTO_HIDE_DURATION = 3000; // milliseconds
+export const MODAL_AUTO_HIDE_DURATION = 1200; // milliseconds - synced with screen transition (FADE_DURATION + 800)
 
 // Security settings
 export const PIN_LENGTH = 4; // digits

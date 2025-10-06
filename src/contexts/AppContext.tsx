@@ -5,6 +5,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initDB, getAll, addItem, updateItem, deleteItem, getAvailableEquipment, getActiveLoans, clearAllData } from '@/utils/db';
 import type { Class, Student, Equipment, Loan } from '@/utils/db';
 import { getNextColor } from '@/constants/colors';
+import { getEquipmentImage } from '@/utils/equipmentImages';
+import { findMatchingImage } from '@/utils/equipmentImageList';
 
 interface AppState {
   // Data
@@ -140,11 +142,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Add equipment - simple
   const addEquipment = async (name: string, category: string, quantity: number) => {
+    // Try to find matching image using smart search
+    const matchedImageName = findMatchingImage(name);
+    const imageUrl = matchedImageName ? `/equipment-icons/${matchedImageName}.webp` : undefined;
+
     const equipmentItem: Equipment = {
       id: Date.now().toString(),
       name,
       category,
-      totalQuantity: quantity
+      totalQuantity: quantity,
+      imageUrl // Auto-set image URL based on smart match
     };
 
     await addItem('equipment', equipmentItem);

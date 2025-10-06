@@ -8,6 +8,7 @@ import { AppProvider, useApp } from './contexts/AppContext';
 import type { Class, Student, Equipment } from './utils/db';
 import { containsInappropriateWords, getInappropriateWordError } from './utils/wordFilter';
 import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH, FADE_DURATION, MODAL_AUTO_HIDE_DURATION, PIN_LENGTH } from './constants/app';
+import { getEquipmentImage } from './utils/equipmentImages';
 
 
 // Simple hash function for PIN storage (basic obfuscation for offline app)
@@ -239,6 +240,19 @@ const SimpleApp: React.FC = () => {
     );
   }, [memoizedStudents, studentSearchTerm, memoizedClasses]);
 
+  // Search term for equipment search
+  const [equipmentSearchTerm, setEquipmentSearchTerm] = useState('');
+
+  // Filtered equipment for search
+  const filteredEquipment = useMemo(() => {
+    if (!equipmentSearchTerm.trim()) return memoizedEquipment;
+
+    return memoizedEquipment.filter(item =>
+      item.name.toLowerCase().includes(equipmentSearchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(equipmentSearchTerm.toLowerCase())
+    );
+  }, [memoizedEquipment, equipmentSearchTerm]);
+
   // Check if first-time setup is needed
   const needsSetup = !localStorage.getItem('adminPin');
   const [screen, setScreen] = useState<Screen>(needsSetup ? 'first-time-setup' : 'start');
@@ -278,6 +292,7 @@ const SimpleApp: React.FC = () => {
     onSubmit: (_value: string) => void;
     maxLength?: number;
     inputMode?: 'text' | 'numeric' | 'decimal';
+    showImagePreview?: boolean; // Show equipment image preview
   } | null>(null);
 
   // Reusable confirmation modal state
@@ -309,13 +324,14 @@ const SimpleApp: React.FC = () => {
   };
 
   // Simplified input prompt with validation
-  const showInput = (title: string, placeholder: string, onSubmit: (_value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric' | 'decimal') => {
+  const showInput = (title: string, placeholder: string, onSubmit: (_value: string) => void, maxLength?: number, inputMode?: 'text' | 'numeric' | 'decimal', showImagePreview?: boolean) => {
     setInputValue(''); // Clear previous input
     setInputPrompt({
       title,
       placeholder,
       maxLength,
       inputMode,
+      showImagePreview,
       onSubmit: (inputValue: string) => {
         // Basic input validation
         const sanitized = inputValue.trim();
@@ -358,10 +374,33 @@ const SimpleApp: React.FC = () => {
       }
     };
 
+    // Show image preview only if enabled, value exists, and has at least 3 characters
+    const imageUrl = inputPrompt.showImagePreview && inputValue.trim().length >= 3
+      ? getEquipmentImage(inputValue.trim())
+      : undefined;
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
           <h2 className="text-3xl font-bold mb-6 text-center">{inputPrompt.title}</h2>
+
+          {/* Image Preview - Fixed height to prevent layout shift */}
+          {inputPrompt.showImagePreview && (
+            <div className="flex justify-center mb-4 h-24">
+              {imageUrl && (
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  className="w-24 h-24 object-contain rounded-lg border-2 border-green-300"
+                  onError={(e) => {
+                    // Hide image if it fails to load
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              )}
+            </div>
+          )}
+
           <input
             id="modal-input"
             name="modalInput"
@@ -416,10 +455,14 @@ const SimpleApp: React.FC = () => {
       setShowConfirmModal(false);
     };
 
+    // Determine emoji based on title
+    const emoji = confirmTitle === 'Klart!' ? '✅' : '❌';
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50" onClick={handleBackdropClick}>
-        <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl" onClick={handleModalClick}>
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl" onClick={handleModalClick}>
           <div className="text-center">
+            <div className="text-7xl mb-4">{emoji}</div>
             <h2 className="text-2xl font-bold mb-2 text-gray-800">{confirmTitle}</h2>
             <p className="text-lg text-gray-600">{confirmMessage}</p>
           </div>
@@ -600,14 +643,14 @@ const SimpleApp: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <button
                   onClick={() => setScreen('borrow-class')}
-                  className="p-8 bg-green-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
+                  className="px-8 py-16 bg-green-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
                   aria-label="Gå till lånesidan för att låna redskap"
                 >
                   LÅNA
                 </button>
                 <button
                   onClick={() => setScreen('return')}
-                  className="p-8 bg-orange-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
+                  className="px-8 py-16 bg-orange-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
                   aria-label="Gå till återlämningssidan för att lämna tillbaka redskap"
                 >
                   ÅTERLÄMNA
@@ -645,7 +688,7 @@ const SimpleApp: React.FC = () => {
               <h1 className="text-4xl font-bold">Välj din klass</h1>
               <button
                 onClick={() => setScreen('start')}
-                className="px-4 py-2 bg-gray-200 rounded"
+                className="px-6 py-3 bg-gray-200 rounded-lg text-lg font-semibold"
                 aria-label="Gå tillbaka till startsidan"
               >
                 ← Tillbaka
@@ -703,7 +746,7 @@ const SimpleApp: React.FC = () => {
                   {selectedClass.name}
                 </span>
               </h1>
-              <button onClick={() => setScreen('borrow-class')} className="px-4 py-2 bg-gray-200 rounded">
+              <button onClick={() => setScreen('borrow-class')} className="px-6 py-3 bg-gray-200 rounded-lg text-lg font-semibold">
                 ← Tillbaka
               </button>
             </div>
@@ -752,24 +795,41 @@ const SimpleApp: React.FC = () => {
       <>
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-8">
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-bold">Välj redskap - {selectedStudent.name}</h1>
-              <div className="flex gap-2">
+            <div className="flex items-center gap-4 mb-8">
+              <h1 className="text-4xl font-bold whitespace-nowrap">Välj redskap - {selectedStudent.name}</h1>
+
+              {/* Equipment Search */}
+              <input
+                type="text"
+                placeholder="Sök redskap..."
+                value={equipmentSearchTerm}
+                onChange={(e) => setEquipmentSearchTerm(e.target.value)}
+                className="w-64 px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                aria-label="Sök efter redskap"
+              />
+
+              <div className="flex-1"></div>
+
+              <div className="flex gap-2 flex-shrink-0">
                 <button onClick={() => {
                   setScreen('start');
                   setSelectedClass(null);
                   setSelectedStudent(null);
-                }} className="px-4 py-2 bg-green-500 text-white rounded">
+                  setEquipmentSearchTerm(''); // Clear search when leaving
+                }} className="px-6 py-3 bg-green-500 text-white rounded-lg text-lg font-semibold">
                   Klar
                 </button>
-                <button onClick={() => setScreen('borrow-student')} className="px-4 py-2 bg-gray-200 rounded">
+                <button onClick={() => {
+                  setScreen('borrow-student');
+                  setEquipmentSearchTerm(''); // Clear search when going back
+                }} className="px-6 py-3 bg-gray-200 rounded-lg text-lg font-semibold">
                   ← Tillbaka
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {memoizedEquipment.map((item) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
+              {filteredEquipment.map((item) => (
                 <button
                   key={item.id}
                   onClick={async () => {
@@ -781,14 +841,18 @@ const SimpleApp: React.FC = () => {
 
                       await createLoan(selectedStudent.id, item.id);
 
-                      // Remove fade effect after success
+                      // Show success confirmation
+                      showConfirmation('Klart!', `${item.name} är utlånat!`);
+
+                      // Auto-return to start after brief delay
                       setTimeout(() => {
                         setFadingItems(prev => {
                           const newSet = new Set(prev);
                           newSet.delete(item.id);
                           return newSet;
                         });
-                      }, FADE_DURATION);
+                        setScreen('start');
+                      }, FADE_DURATION + 800); // Extra time to see confirmation
                     } catch (error) {
                       // Error creating loan - remove fade and show feedback
                       setFadingItems(prev => {
@@ -799,7 +863,7 @@ const SimpleApp: React.FC = () => {
                       showConfirmation('Fel', 'Kunde inte låna ut redskapet. Försök igen.');
                     }
                   }}
-                  className={`p-6 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
+                  className={`px-3 py-2 rounded-xl border-2 transition-all duration-200 active:scale-95 flex flex-col items-center ${
                     item.available <= 0
                       ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
                       : fadingItems.has(item.id)
@@ -808,9 +872,25 @@ const SimpleApp: React.FC = () => {
                   }`}
                   disabled={item.available <= 0}
                 >
-                  <div className="text-2xl mb-2">•</div>
-                  <div className="text-xl font-semibold">{item.name}</div>
-                  <div className="text-sm text-gray-600">{item.available} kvar</div>
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="w-14 h-14 object-contain mb-1"
+                      onError={(e) => {
+                        // Fallback to dot if image fails to load
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.textContent = '•';
+                        fallback.className = 'text-2xl mb-1';
+                        (e.target as HTMLImageElement).parentElement?.insertBefore(fallback, e.target as HTMLImageElement);
+                      }}
+                    />
+                  ) : (
+                    <div className="text-2xl mb-1">•</div>
+                  )}
+                  <div className="text-sm font-semibold text-center leading-tight">{item.name}</div>
+                  <div className="text-xs text-gray-600 mt-0.5">{item.available} kvar</div>
                 </button>
               ))}
 
@@ -835,7 +915,7 @@ const SimpleApp: React.FC = () => {
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
                       }, 100);
-                    });
+                    }, undefined, undefined, true); // Enable image preview
                   }}
                   className="p-6 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
                 >
@@ -863,7 +943,7 @@ const SimpleApp: React.FC = () => {
               <h1 className="text-4xl font-bold">Lämna tillbaka</h1>
               <button
                 onClick={() => setScreen('start')}
-                className="px-4 py-2 bg-gray-200 rounded"
+                className="px-6 py-3 bg-gray-200 rounded-lg text-lg font-semibold"
                 aria-label="Gå tillbaka till startsidan"
               >
                 ← Tillbaka
@@ -965,7 +1045,7 @@ const SimpleApp: React.FC = () => {
             </button>
             <button
               onClick={() => setScreen('start')}
-              className="w-full p-3 mt-4 bg-gray-200 rounded"
+              className="w-full px-6 py-3 mt-4 bg-gray-200 rounded-lg text-lg font-semibold"
             >
               Tillbaka
             </button>
@@ -990,7 +1070,7 @@ const SimpleApp: React.FC = () => {
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowResetConfirmModal(true)}
-                  className="px-4 py-2 bg-red-500 text-white rounded active:scale-95 transition-transform"
+                  className="px-6 py-3 bg-red-500 text-white rounded-lg text-lg font-semibold"
                 >
                   Reset All Data
                 </button>
@@ -1005,13 +1085,13 @@ const SimpleApp: React.FC = () => {
                       showConfirmation('PIN uppdaterad!', 'Ny admin PIN är sparad');
                     }, PIN_LENGTH, 'numeric');
                   }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded active:scale-95 transition-transform"
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg text-lg font-semibold"
                 >
                   Ändra PIN
                 </button>
                 <button
                   onClick={toggleUserCreation}
-                  className={`px-4 py-2 rounded active:scale-95 transition-transform ${
+                  className={`px-6 py-3 rounded-lg text-lg font-semibold ${
                     allowUserCreation
                       ? 'bg-green-500 text-white'
                       : 'bg-black text-white'
@@ -1021,7 +1101,7 @@ const SimpleApp: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setScreen('start')}
-                  className="px-4 py-2 bg-gray-200 rounded active:scale-95 transition-transform"
+                  className="px-6 py-3 bg-gray-200 rounded-lg text-lg font-semibold"
                 >
                   ← Tillbaka till start
                 </button>

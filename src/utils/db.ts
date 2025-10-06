@@ -21,6 +21,7 @@ export interface Equipment {
   name: string;
   category: string;
   totalQuantity: number;
+  imageUrl?: string; // Optional image path
 }
 
 export interface Loan {
