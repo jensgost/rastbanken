@@ -44,7 +44,6 @@ dist/
 
 # Image processing scripts (local development only)
 optimize-images.sh
-update-image-list.cjs
 
 # Vite
 .vite
