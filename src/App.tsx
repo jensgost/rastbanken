@@ -379,6 +379,11 @@ const SimpleApp: React.FC = () => {
       ? getEquipmentImage(inputValue.trim())
       : undefined;
 
+    // Debug: Log image URL when it changes
+    if (imageUrl) {
+      console.log('Image preview URL:', imageUrl, 'for input:', inputValue);
+    }
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
@@ -393,8 +398,12 @@ const SimpleApp: React.FC = () => {
                   alt="Preview"
                   className="w-24 h-24 object-contain rounded-lg border-2 border-green-300"
                   onError={(e) => {
+                    console.error('Failed to load image:', imageUrl);
                     // Hide image if it fails to load
                     (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('Successfully loaded image:', imageUrl);
                   }}
                 />
               )}
@@ -1264,7 +1273,7 @@ const SimpleApp: React.FC = () => {
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
                       }, 100);
-                    });
+                    }, undefined, undefined, true); // Enable image preview
                   }}
                   className="w-full mb-4 p-3 bg-green-500 text-white rounded font-semibold active:scale-95 transition-transform duration-75"
                 >
