@@ -24,17 +24,16 @@ export const normalizeEquipmentName = (name: string): string => {
  * Returns the WebP image path if a match is found
  * Properly encodes Swedish characters (å, ä, ö) for URL compatibility
  * Uses Vite's BASE_URL for correct path in both dev and production
- * Normalizes filename to NFD to match actual filesystem encoding
+ * Uses NFC encoding for URLs (web standard)
  */
 export const getEquipmentImageUrl = (equipmentName: string): string | undefined => {
   const matchedImage = findMatchingImage(equipmentName);
   if (!matchedImage) {
     return undefined;
   }
-  // Normalize to NFD (decomposed) to match actual filesystem encoding on macOS
-  // Then encode for URL to handle Swedish characters (å, ä, ö) and spaces
-  const normalizedFilename = matchedImage.normalize('NFD');
-  const encodedFilename = encodeURIComponent(normalizedFilename);
+  // Keep as NFC (already normalized in image list) and encode for URL
+  // This works for both dev server and GitHub Pages
+  const encodedFilename = encodeURIComponent(matchedImage);
   // Use Vite's BASE_URL which is '/' in dev and '/rastbanken/' in production
   const baseUrl = import.meta.env.BASE_URL;
   return `${baseUrl}equipment-icons/${encodedFilename}.webp`;
