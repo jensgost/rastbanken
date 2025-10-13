@@ -379,20 +379,6 @@ const SimpleApp: React.FC = () => {
       ? getEquipmentImage(inputValue.trim())
       : undefined;
 
-    // Debug: Log image URL when it changes
-    if (imageUrl) {
-      console.log('Image preview URL:', imageUrl, 'for input:', inputValue);
-    }
-
-    // Debug panel for iPad testing (remove after fixing)
-    const [debugInfo, setDebugInfo] = React.useState<string>('');
-    React.useEffect(() => {
-      if (inputPrompt?.showImagePreview && inputValue.length >= 3) {
-        setDebugInfo(`Input: "${inputValue}" | URL: ${imageUrl || 'none'}`);
-      } else {
-        setDebugInfo('');
-      }
-    }, [inputValue, imageUrl]);
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -408,22 +394,11 @@ const SimpleApp: React.FC = () => {
                   alt="Preview"
                   className="w-24 h-24 object-contain rounded-lg border-2 border-green-300"
                   onError={(e) => {
-                    console.error('Failed to load image:', imageUrl);
                     // Hide image if it fails to load
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
-                  onLoad={() => {
-                    console.log('Successfully loaded image:', imageUrl);
-                  }}
                 />
               )}
-            </div>
-          )}
-
-          {/* Debug info - visible on screen */}
-          {debugInfo && (
-            <div className="mb-2 p-2 bg-yellow-100 border border-yellow-400 rounded text-xs text-left break-all">
-              {debugInfo}
             </div>
           )}
 
