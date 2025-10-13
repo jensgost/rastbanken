@@ -6,7 +6,7 @@
  * Do not edit manually - run: node update-image-list.cjs
  */
 
-export const availableImages = [
+const availableImages = [
   'badmintonboll',
   'basketboll',
   'bil',

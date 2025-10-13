@@ -21,6 +21,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "src/setupTests.ts",
+    "src/vite-env.d.ts",
     ".eslintrc.json"
   ],
   "rules": {

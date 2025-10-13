@@ -5,21 +5,6 @@
 import { findMatchingImage } from './equipmentImageList';
 
 /**
- * Normalize equipment name to match filename
- * Converts to lowercase and removes special characters
- */
-export const normalizeEquipmentName = (name: string): string => {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/å/g, 'a')
-    .replace(/ä/g, 'a')
-    .replace(/ö/g, 'o')
-    .replace(/\s+/g, '_') // Replace spaces with underscores (match your filenames)
-    .replace(/[^a-z0-9_]/g, ''); // Remove special chars except underscore
-};
-
-/**
  * Get image URL for equipment name with smart matching
  * Returns the WebP image path if a match is found
  * Properly encodes Swedish characters (å, ä, ö) for URL compatibility

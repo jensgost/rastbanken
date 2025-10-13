@@ -24,11 +24,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@/components/*": ["src/components/*"],
-      "@/services/*": ["src/services/*"],
-      "@/types/*": ["src/types/*"],
       "@/contexts/*": ["src/contexts/*"],
-      "@/utils/*": ["src/utils/*"]
+      "@/utils/*": ["src/utils/*"],
+      "@/constants/*": ["src/constants/*"]
     }
   },
   "include": ["src"],

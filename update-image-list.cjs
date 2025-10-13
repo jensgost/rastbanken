@@ -27,7 +27,7 @@ const content = `/**
  * Do not edit manually - run: node update-image-list.cjs
  */
 
-export const availableImages = [
+const availableImages = [
 ${files.map(name => `  '${name}',`).join('\n')}
 ];
 

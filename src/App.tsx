@@ -3,7 +3,7 @@
  * LÅNA: Start → Class → Name → Equipment
  * ÅTERLÄMNA: Start → List loans → Tap name
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import type { Class, Student, Equipment } from './utils/db';
 import { containsInappropriateWords, getInappropriateWordError } from './utils/wordFilter';
@@ -11,13 +11,52 @@ import { MAX_EQUIPMENT_QUANTITY, MAX_NAME_LENGTH, FADE_DURATION, MODAL_AUTO_HIDE
 import { getEquipmentImage } from './utils/equipmentImages';
 
 
-// Simple hash function for PIN storage (basic obfuscation for offline app)
+/**
+ * PIN Obfuscation Function
+ *
+ * ⚠️ SECURITY NOTICE: This is NOT cryptographic hashing - it's basic obfuscation only.
+ *
+ * Purpose:
+ * - Prevents casual viewing of PINs in localStorage/DevTools
+ * - Suitable for low-security school application with physical device control
+ *
+ * What it does:
+ * - Uses Base64 encoding with salt and reversed PIN
+ * - Easily reversible by anyone with access to this source code
+ *
+ * What it does NOT do:
+ * - Does NOT provide cryptographic security
+ * - Does NOT protect against determined attackers
+ * - Does NOT use secure hashing algorithms (SHA-256, bcrypt, etc.)
+ *
+ * For production/sensitive data, use proper cryptographic functions like:
+ * - bcrypt with high work factor
+ * - PBKDF2 with many iterations
+ * - Argon2
+ *
+ * @param pin - 4-digit PIN to obfuscate
+ * @returns Base64-encoded obfuscated PIN
+ */
 const hashPin = (pin: string): string => {
   const salt = 'rastbanken-salt-2024';
   return btoa(salt + pin + pin.split('').reverse().join(''));
 };
 
-// Simple admin PIN check - secure enough for school app
+/**
+ * PIN Verification Function
+ *
+ * ⚠️ SECURITY NOTICE: Uses obfuscation, not cryptographic hashing.
+ *
+ * Checks PIN against:
+ * 1. User-defined PIN (stored obfuscated in localStorage)
+ * 2. Master PIN (hard-coded with obfuscation)
+ *
+ * Suitable for school iPad with physical access control.
+ * Not suitable for applications requiring strong security.
+ *
+ * @param pin - 4-digit PIN to verify
+ * @returns true if PIN matches, false otherwise
+ */
 const checkPin = (pin: string) => {
   const storedHashedPin = localStorage.getItem('adminPin');
 
@@ -307,20 +346,33 @@ const SimpleApp: React.FC = () => {
   // Reset confirmation modal state
   const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
 
+  // Timeout tracking for cleanup
+  const timeoutIds = useRef<Set<NodeJS.Timeout>>(new Set());
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutIds.current.forEach(id => clearTimeout(id));
+      timeoutIds.current.clear();
+    };
+  }, []);
+
   // Helper function for fade-out delete animation
   const fadeAndDelete = (itemId: string, deleteAction: () => void) => {
     // Add to fading items for gray fade effect
     setFadingItems(prev => new Set(prev).add(itemId));
 
     // After fade animation, perform delete
-    setTimeout(() => {
+    const id = setTimeout(() => {
       deleteAction();
       setFadingItems(prev => {
         const newSet = new Set(prev);
         newSet.delete(itemId);
         return newSet;
       });
+      timeoutIds.current.delete(id);
     }, FADE_DURATION); // Fade duration (matches return page)
+    timeoutIds.current.add(id);
   };
 
   // Simplified input prompt with validation
@@ -359,11 +411,15 @@ const SimpleApp: React.FC = () => {
     setConfirmMessage(message);
     setShowConfirmModal(true);
     // Auto-hide after 3 seconds
-    setTimeout(() => setShowConfirmModal(false), MODAL_AUTO_HIDE_DURATION);
+    const id = setTimeout(() => {
+      setShowConfirmModal(false);
+      timeoutIds.current.delete(id);
+    }, MODAL_AUTO_HIDE_DURATION);
+    timeoutIds.current.add(id);
   };
 
   // Input Modal Component
-  const InputModal = () => {
+  const InputModal = React.memo(() => {
     if (!inputPrompt) return null;
 
     const handleSubmit = () => {
@@ -442,10 +498,10 @@ const SimpleApp: React.FC = () => {
         </div>
       </div>
     );
-  };
+  });
 
   // Confirmation Modal Component
-  const ConfirmationModal = () => {
+  const ConfirmationModal = React.memo(() => {
     if (!showConfirmModal) return null;
 
     const handleModalClick = (e: React.MouseEvent) => {
@@ -470,10 +526,10 @@ const SimpleApp: React.FC = () => {
         </div>
       </div>
     );
-  };
+  });
 
   // Reset Confirmation Modal Component
-  const ResetConfirmationModal = () => {
+  const ResetConfirmationModal = React.memo(() => {
     if (!showResetConfirmModal) return null;
 
     const handleModalClick = (e: React.MouseEvent) => {
@@ -519,10 +575,10 @@ const SimpleApp: React.FC = () => {
         </div>
       </div>
     );
-  };
+  });
 
   // Class Selection Modal Component
-  const ClassSelectionModal = () => {
+  const ClassSelectionModal = React.memo(() => {
     if (!showClassSelection) return null;
 
     const handleModalClick = (e: React.MouseEvent) => {
@@ -573,7 +629,18 @@ const SimpleApp: React.FC = () => {
         </div>
       </div>
     );
-  };
+  });
+
+  // Render modals once at app level (outside all screen returns)
+  // These are defined here so they have access to the state
+  const modals = (
+    <>
+      <InputModal />
+      <ConfirmationModal />
+      <ResetConfirmationModal />
+      <ClassSelectionModal />
+    </>
+  );
 
   if (loading) {
     return (
@@ -637,45 +704,39 @@ const SimpleApp: React.FC = () => {
   // START SCREEN
   if (screen === 'start') {
     return (
-      <>
-        <div className="min-h-screen bg-sky-300 p-8 flex flex-col relative overflow-hidden">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="max-w-4xl mx-auto text-center w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <button
-                  onClick={() => setScreen('borrow-class')}
-                  className="px-8 py-16 bg-green-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
-                  aria-label="Gå till lånesidan för att låna redskap"
-                >
-                  LÅNA
-                </button>
-                <button
-                  onClick={() => setScreen('return')}
-                  className="px-8 py-16 bg-orange-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
-                  aria-label="Gå till återlämningssidan för att lämna tillbaka redskap"
-                >
-                  ÅTERLÄMNA
-                </button>
-              </div>
+      <div className="min-h-screen bg-sky-300 p-8 flex flex-col relative overflow-hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-4xl mx-auto text-center w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <button
+                onClick={() => setScreen('borrow-class')}
+                className="px-8 py-16 bg-green-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
+                aria-label="Gå till lånesidan för att låna redskap"
+              >
+                LÅNA
+              </button>
+              <button
+                onClick={() => setScreen('return')}
+                className="px-8 py-16 bg-orange-500 text-white rounded-xl text-4xl font-bold active:scale-95 transition-transform"
+                aria-label="Gå till återlämningssidan för att lämna tillbaka redskap"
+              >
+                ÅTERLÄMNA
+              </button>
             </div>
           </div>
-
-          <div className="flex justify-center pb-8">
-            <button
-              onClick={() => setScreen('admin')}
-              className="px-8 py-3 bg-gray-200 text-gray-600 rounded-lg text-lg active:scale-95 transition-transform"
-              aria-label="Öppna administrationsmenyn"
-              title="Admin"
-            >
-              <span className="text-2xl">⚙️</span>
-            </button>
-          </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
-      </>
+
+        <div className="flex justify-center pb-8">
+          <button
+            onClick={() => setScreen('admin')}
+            className="px-8 py-3 bg-gray-200 text-gray-600 rounded-lg text-lg active:scale-95 transition-transform"
+            aria-label="Öppna administrationsmenyn"
+            title="Admin"
+          >
+            <span className="text-2xl">⚙️</span>
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -721,10 +782,7 @@ const SimpleApp: React.FC = () => {
             </div>
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
@@ -782,10 +840,7 @@ const SimpleApp: React.FC = () => {
             </div>
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
@@ -846,14 +901,16 @@ const SimpleApp: React.FC = () => {
                       showConfirmation('Klart!', `${item.name} är utlånat!`);
 
                       // Auto-return to start after brief delay
-                      setTimeout(() => {
+                      const id = setTimeout(() => {
                         setFadingItems(prev => {
                           const newSet = new Set(prev);
                           newSet.delete(item.id);
                           return newSet;
                         });
                         setScreen('start');
+                        timeoutIds.current.delete(id);
                       }, FADE_DURATION + 800); // Extra time to see confirmation
+                      timeoutIds.current.add(id);
                     } catch (error) {
                       // Error creating loan - remove fade and show feedback
                       setFadingItems(prev => {
@@ -902,7 +959,7 @@ const SimpleApp: React.FC = () => {
                       const formattedName = toCamelCase(equipmentName);
                       // Close the first modal before opening the second
                       setInputPrompt(null);
-                      setTimeout(() => {
+                      const id = setTimeout(() => {
                         showInput('Hur många finns det?', 'Ange antal...', (quantityStr) => {
                           const quantity = parseInt(quantityStr);
                           if (isNaN(quantity) || quantity < 1) {
@@ -915,7 +972,9 @@ const SimpleApp: React.FC = () => {
                           }
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
+                        timeoutIds.current.delete(id);
                       }, 100);
+                      timeoutIds.current.add(id);
                     }, undefined, undefined, true); // Enable image preview
                   }}
                   className="p-6 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
@@ -926,10 +985,7 @@ const SimpleApp: React.FC = () => {
             </div>
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
@@ -963,14 +1019,16 @@ const SimpleApp: React.FC = () => {
                     onClick={async () => {
                       setFadingItems(prev => new Set(prev).add(loan.id));
 
-                      setTimeout(async () => {
+                      const id = setTimeout(async () => {
                         await returnLoan(loan.id);
                         setFadingItems(prev => {
                           const newSet = new Set(prev);
                           newSet.delete(loan.id);
                           return newSet;
                         });
+                        timeoutIds.current.delete(id);
                       }, FADE_DURATION);
+                      timeoutIds.current.add(id);
                     }}
                     className={`p-6 bg-white rounded-xl border-2 border-orange-300 text-left transition-all duration-400 relative ${
                       fadingItems.has(loan.id) ? 'opacity-20 bg-gray-100 border-gray-200' : ''
@@ -1003,10 +1061,7 @@ const SimpleApp: React.FC = () => {
             )}
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
@@ -1052,10 +1107,7 @@ const SimpleApp: React.FC = () => {
             </button>
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
@@ -1175,10 +1227,12 @@ const SimpleApp: React.FC = () => {
                       const formattedName = toCamelCase(name);
                       // Close the input modal and show class selection
                       setInputPrompt(null);
-                      setTimeout(() => {
+                      const id = setTimeout(() => {
                         setPendingStudentName(formattedName);
                         setShowClassSelection(true);
+                        timeoutIds.current.delete(id);
                       }, 100);
+                      timeoutIds.current.add(id);
                     });
                   }}
                   className="w-full mb-4 p-3 bg-green-500 text-white rounded font-semibold active:scale-95 transition-transform duration-75"
@@ -1251,7 +1305,7 @@ const SimpleApp: React.FC = () => {
                       const formattedName = toCamelCase(name);
                       // Close the first modal before opening the second
                       setInputPrompt(null);
-                      setTimeout(() => {
+                      const id = setTimeout(() => {
                         showInput('Antal:', 'Hur många finns det?', (quantityStr) => {
                           const quantity = parseInt(quantityStr);
                           if (isNaN(quantity) || quantity < 1) {
@@ -1264,7 +1318,9 @@ const SimpleApp: React.FC = () => {
                           }
                           addEquipment(formattedName, 'Sport', quantity);
                         }, 3, 'numeric');
+                        timeoutIds.current.delete(id);
                       }, 100);
+                      timeoutIds.current.add(id);
                     }, undefined, undefined, true); // Enable image preview
                   }}
                   className="w-full mb-4 p-3 bg-green-500 text-white rounded font-semibold active:scale-95 transition-transform duration-75"
@@ -1331,10 +1387,7 @@ const SimpleApp: React.FC = () => {
             </div>
           </div>
         </div>
-        <InputModal />
-        <ConfirmationModal />
-        <ResetConfirmationModal />
-        <ClassSelectionModal />
+        {modals}
       </>
     );
   }
